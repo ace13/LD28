@@ -58,12 +58,10 @@ int Engine::mainLoop()
         switch(k)
         {
         KEY(W) KEY(A) KEY(S) KEY(D) KEY(Q) KEY(E) KEY(R)
-        //KEY(Up) KEY(Down) KEY(Left) KEY(Right)
-        KEY(Space) KEY(Return) KEY(Escape)
-        KEY(LShift)
+        KEY(LShift) KEY(Escape)
 
         default:
-        return "Invalid";
+        return "";
         }
     };
 #undef KEY
@@ -105,7 +103,11 @@ int Engine::mainLoop()
                 {
                     Kunlaboro::Message msg(Kunlaboro::Type_Message, nullptr);
                     msg.payload = (ev.type == sf::Event::KeyPressed);
-                    mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Key." + keyToString(ev.key.code)), msg);
+                    std::string evName = keyToString(ev.key.code);
+                    if (evName.empty())
+                        break;
+
+                    mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Key." + evName), msg);
                 } break;
 
             case sf::Event::MouseButtonPressed:

@@ -43,6 +43,8 @@ set(Game_SOURCES
     Game/Weapon.cpp
     Game/Bullet.hpp
     Game/Bullet.cpp
+    Game/Particle.hpp
+    Game/Particle.cpp
 
     Game/Dialog.hpp
     Game/Dialog.cpp
