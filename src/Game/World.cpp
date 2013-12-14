@@ -53,8 +53,14 @@ void World::addedToEntity()
     {
         auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
 
+        sf::Vector2f vC = target.getView().getCenter(), vS = target.getView().getSize();
+
         sf::Sprite sprite(mBigOne);
+        sprite.setOrigin((sf::Vector2f)mBigOne.getSize() / 2.f);
+        
         target.draw(sprite);
+
+
     });
     changeRequestPriority("Event.Draw", -9001);
 }

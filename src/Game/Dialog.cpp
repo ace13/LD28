@@ -38,7 +38,7 @@ void Dialog::addedToEntity()
     {
         auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
 
-        sf::Text message(mMessage, Resources::Font_Dosis);
+        sf::Text message(mMessage, Resources::Font_Dosis, 26U);
         auto rect = message.getLocalBounds();
         sf::RectangleShape box(sf::Vector2f(rect.width + 16, rect.height + 16));
         sf::ConvexShape speechThingy(3);
