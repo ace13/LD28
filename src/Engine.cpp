@@ -3,33 +3,40 @@
 #include <Kunlaboro/Component.hpp>
 #include <SFML/Window/Event.hpp>
 
-class ResizeHandler : public Kunlaboro::Component
+class EngineHandler : public Kunlaboro::Component
 {
 public:
-    ResizeHandler(sf::View& ui, sf::View& game) : Kunlaboro::Component("I am an internal component, don't poke me :("), mUi(ui), mGame(game) { }
+    EngineHandler(sf::RenderWindow& win, sf::View& ui, sf::View& game) : Kunlaboro::Component("I am an internal component, don't poke me :("), mWin(win), mUi(ui), mGame(game) { }
 
     void addedToEntity()
     {
-        requestMessage("Event.Window.Resized", &ResizeHandler::resized);
+        requestMessage("Event.Engine.Init", &EngineHandler::resized);
+        requestMessage("Event.Window.Resized", &EngineHandler::resized);
         changeRequestPriority("Event.Window.Resized", -42);
+        requestMessage("ExitGame", [this](const Kunlaboro::Message& msg) { mWin.close(); });
     }
 
     void resized(const Kunlaboro::Message& msg)
     {
-        auto size = boost::any_cast<sf::Vector2u>(msg.payload);
+        sf::Vector2u size = mWin.getSize();
 
         mUi.setSize((sf::Vector2f)size);
         mUi.setCenter((sf::Vector2f)size / 2.f);
 
+        auto gSize = mGame.getSize();
+        float aspect = size.x / size.y;
+
+        mGame.setSize(gSize.y * aspect, gSize.y);
     }
 
 private:
     sf::View& mUi, mGame;
+    sf::RenderWindow& mWin;
 };
 
 Engine::Engine(Kunlaboro::EntitySystem& sys) : mSystem(sys)
 {
-    sys.registerComponent("I am an internal component, don't poke me :(", [&]() { return new ResizeHandler(mUiView, mGameView); });
+    sys.registerComponent("I am an internal component, don't poke me :(", [&]() { return new EngineHandler(mWindow, mUiView, mGameView); });
 
     auto ent = sys.createEntity();
     sys.addComponent(ent, "I am an internal component, don't poke me :(");
@@ -39,10 +46,10 @@ Engine::~Engine()
 {
 }
 
-#define KEY(key) case sf::Keyboard::##key##: return #key; break;
 
 int Engine::mainLoop()
 {
+#define KEY(key) case sf::Keyboard::##key##: return #key; break;
     auto keyToString = [](sf::Keyboard::Key k) -> std::string {
         switch(k)
         {
@@ -54,13 +61,17 @@ int Engine::mainLoop()
         return "Invalid";
         }
     };
+#undef KEY
 
     mWindow.create(sf::VideoMode(1024,768), "Ludum Dare #28");
 
     sf::Event ev;
     sf::Clock timer;
 
+    mGameView.setSize(0, 1024);
+
     Kunlaboro::Message msg(Kunlaboro::Type_Message, nullptr);
+    mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Engine.Init"), msg);
 
     while (mWindow.isOpen())
     {
@@ -90,10 +101,20 @@ int Engine::mainLoop()
                     msg.payload = pressed;
                     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Key." + keyToString(ev.key.code)), msg);
                 } break;
+
             case sf::Event::MouseButtonPressed:
             case sf::Event::MouseButtonReleased:
                 {
+                    bool pressed = ev.type == sf::Event::MouseButtonPressed;
 
+                    msg.payload = std::tuple<sf::Mouse::Button, sf::Vector2f, bool>(ev.mouseButton.button, sf::Vector2f(ev.mouseButton.x, ev.mouseButton.y), pressed);
+                    mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Mouse.Click"), msg);
+                } break;
+
+            case sf::Event::MouseMoved:
+                {
+                    msg.payload = sf::Vector2f(ev.mouseMove.x, ev.mouseMove.y);
+                    mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Mouse.Move"), msg);
                 } break;
             }
         }
