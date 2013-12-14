@@ -2,10 +2,16 @@
 #include "Weapon.hpp"
 #include "Dialog.hpp"
 #include "../Resources.hpp"
+#include <cmath>
 #include <tuple>
 #include <random>
 #include <SFML/Graphics/Sprite.hpp>
 #include <Kunlaboro/EntitySystem.hpp>
+
+#ifndef M_PI
+#define M_PI (4.f*atan(1.f))
+#endif
+
 
 Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mPosition(256, 256), mHealth(100), mArmor(1), mTime(0), mLastAng(0)
 {
@@ -71,7 +77,7 @@ void Enemy::addedToEntity()
         enemy.setTextureRect(mSheet.getRect(0,0));
         enemy.setOrigin(enemy.getTextureRect().width / 2, enemy.getTextureRect().height / 2);
         enemy.setPosition(mPosition);
-        enemy.setRotation(mLastAng * (180 / 3.1415));
+        enemy.setRotation(mLastAng * (180 / M_PI));
 
         target.draw(enemy);
     });

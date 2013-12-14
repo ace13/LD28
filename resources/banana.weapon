@@ -7,6 +7,7 @@ Magazine Sprite: Banana.png
 
 Type: Pistol
 Bullets Per Shot: 1
+Reload Time: 2.0 - 3
 
 Rate: 0 - 0.1
 Damage: 1 - 5.0

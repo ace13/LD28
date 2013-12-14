@@ -2,6 +2,11 @@
 #include "../Resources.hpp"
 #include <iomanip>
 #include <sstream>
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI (4.f*atan(1.f))
+#endif
 
 const time_t Countdown::Target = 1386986400;
 
@@ -35,7 +40,7 @@ void Countdown::drawUi(const Kunlaboro::Message& msg)
     oss << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
 
     string.setString(oss.str());
-    string.setColor(sf::Color((int)(mRandomValue * 100) % 256, (int)((mRandomValue * 100) * 3.1415) % 256, (int)((mRandomValue * 100) / 6.218) % 256));
+    string.setColor(sf::Color((int)(mRandomValue * 100) % 256, (int)((mRandomValue * 100) * M_PI) % 256, (int)((mRandomValue * 100) / (M_PI*2)) % 256));
 
     auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
 

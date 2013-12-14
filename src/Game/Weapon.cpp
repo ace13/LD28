@@ -26,7 +26,8 @@ void Weapon::addedToEntity()
         mDamage = atof(file["Damage"].c_str());
         mSpread = atof(file["Spread"].c_str());
         mFireRate = atof(file["Rate"].c_str());
-    
+        mReloadTime = atof(file["Reload Time"].c_str());
+
         mMags = atoi(file["Mags"].c_str());
         mBulletsPerMag = atoi(file["Bullets"].c_str());
         mBulletsPerShot = atoi(file["Bullets Per Shot"].c_str());

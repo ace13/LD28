@@ -20,17 +20,14 @@ void Resources::initialize()
 
     for (auto it = boost::filesystem::directory_iterator("."); it != boost::filesystem::directory_iterator(); ++it)
     {
-        std::string path = it->path().string();
-        std::string ext = it->path().extension().string();
-
         if (it->path().extension() == ".weapon")
         {
             DataFile test;
             if (!test.loadFromFile(it->path().string())) throw std::runtime_error("Failed to load weapon from " + it->path().string());
 
-            if (Texture_Weapons.count(test["Weapon Sprite"]) == 0) Texture_Weapons[test["Weapon Sprite"]];
-            if (Texture_Weapons.count(test["Bullet Sprite"]) == 0) Texture_Weapons[test["Bullet Sprite"]];
-            if (Texture_Weapons.count(test["Magazine Sprite"]) == 0) Texture_Weapons[test["Magazine Sprite"]];
+            if (Texture_Weapons.count(test["Weapon Sprite"]) == 0) Texture_Weapons[test["Weapon Sprite"]] = sf::Texture();
+            if (Texture_Weapons.count(test["Bullet Sprite"]) == 0) Texture_Weapons[test["Bullet Sprite"]] = sf::Texture();
+            if (Texture_Weapons.count(test["Magazine Sprite"]) == 0) Texture_Weapons[test["Magazine Sprite"]] = sf::Texture();
 
             Data_Weapons.push_back(test);
         }

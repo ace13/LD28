@@ -7,6 +7,11 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI (4.f*atan(1.f))
+#endif
 
 Menu::Menu() : Kunlaboro::Component("Game.Menu"), mTime(0), mInGame(false)
 {
@@ -141,7 +146,7 @@ void Menu::drawUi(sf::RenderTarget& target)
     string.setCharacterSize(120);
     string.setPosition(mScreenCenter.x, 60);
 
-    string.rotate(sin(mTime) * 3.1415);
+    string.rotate(sin(mTime) * M_PI);
 
     auto rect = string.getLocalBounds();
     string.setOrigin(rect.width / 2.f, rect.height / 2.f);
