@@ -7,7 +7,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <Kunlaboro/EntitySystem.hpp>
 
-Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mPosition(100, 100), mHealth(100), mArmor(1), mTime(0), mLastAng(0)
+Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mPosition(256, 256), mHealth(100), mArmor(1), mTime(0), mLastAng(0)
 {
 }
 
