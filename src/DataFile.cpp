@@ -74,7 +74,7 @@ bool DataFile::loadFromFile(const std::string& filename)
 
             std::string lower = value.substr(0, pos);
             while(lower.back() == ' ')
-                lower.pop_back();
+                lower.erase(lower.size()-1);
 
             std::string upper = value.substr(pos+1);
             while(upper.front() == ' ')
