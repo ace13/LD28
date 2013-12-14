@@ -2,6 +2,7 @@
 
 #include "../SpriteSheet.hpp"
 #include <Kunlaboro/Component.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 class World : public Kunlaboro::Component
 {
@@ -13,5 +14,5 @@ public:
 
 private:
     SpriteSheet mSheet;
-
+    sf::Texture mBigOne;
 };

@@ -65,7 +65,7 @@ void Weapon::addedToEntity()
     requestMessage("Throw it to the ground!", [this](const Kunlaboro::Message& msg)
     {
         ///\TODO Throw the weapon
-        printf("TODO: Throw weapon\n");
+        printf("TODO: Throw weapon TO THE GROUND\n");
         getEntitySystem()->destroyComponent(this);
     }, true);
 
