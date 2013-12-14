@@ -22,6 +22,11 @@ void Enemy::addedToEntity()
         float dt = boost::any_cast<float>(msg.payload);
         std::random_device dev;
 
+        sf::Vector2f playerPos;
+        auto reply = sendGlobalQuestion("Where's the player?");
+        if (reply.handled)
+            playerPos = boost::any_cast<sf::Vector2f>(reply.payload);
+
         float randAng = std::uniform_real_distribution<float>(-0.1, 0.1)(dev);
         
         mLastAng += randAng;

@@ -117,6 +117,7 @@ void Player::addedToEntity()
 
     requestMessage("Where am I shooting?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = std::make_tuple(mPosition, mAngle); }, true);
     requestMessage("Where am I?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mPosition; }, true);
+    requestMessage("Where's the player?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mPosition; });
 
     requestMessage("Event.Key.W", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_W; else mPressed &= ~M_W; });
     requestMessage("Event.Key.A", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_A; else mPressed &= ~M_A; });
@@ -133,7 +134,6 @@ void Player::addedToEntity()
     });
     requestMessage("Event.Key.Q", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) sendMessage("Throw it to the ground!"); });
     requestMessage("Event.Key.R", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) sendMessage("More ammo!"); });
-
 
     requestMessage("Event.Mouse.MoveGame", [this](const Kunlaboro::Message& msg)
     {
