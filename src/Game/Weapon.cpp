@@ -24,6 +24,7 @@ void Weapon::addedToEntity()
         DataFile& file = Resources::Data_Weapons[weapon(dev)];
 
         mName = file["Name"];
+        mBulletName = file["Bullet Name"];
         mDamage = atof(file["Damage"].c_str());
         mSpread = atof(file["Spread"].c_str());
         mFireRate = atof(file["Rate"].c_str());

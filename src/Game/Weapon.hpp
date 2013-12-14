@@ -12,7 +12,8 @@ public:
 
     void addedToEntity();
 
-    inline std::string weaponName() const { return Weapon::mName; }
+    inline std::string weaponName() const { return mName; }
+    inline std::string bulletName() const { return mBulletName; }
 
     inline sf::Texture& weaponTexture() const { return *mTexture; }
     inline sf::Texture& bulletTexture() const { return *mBulletTexture; }
@@ -25,7 +26,7 @@ public:
     inline float getSpread() const { return mSpread; }
 
 private:
-    std::string mName;
+    std::string mName, mBulletName;
 
     sf::Texture *mTexture, *mMagazineTexture, *mBulletTexture;
 

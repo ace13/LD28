@@ -23,6 +23,7 @@ void Enemy::addedToEntity()
         std::random_device dev;
 
         float randAng = std::uniform_real_distribution<float>(-0.1, 0.1)(dev);
+        
         mLastAng += randAng;
         mPosition += sf::Vector2f(cos(mLastAng), sin(mLastAng)) * dt * 100.f;
 
@@ -82,7 +83,7 @@ void Enemy::addedToEntity()
             auto& sys = *getEntitySystem();
 
             auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-            dialog->setMessage("Eat " + weap->weaponName() + " and die!");
+            dialog->setMessage("Eat " + weap->bulletName() + " and die!");
             addLocalComponent(dialog);
         }
         else
@@ -90,7 +91,7 @@ void Enemy::addedToEntity()
             auto& sys = *getEntitySystem();
 
             auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-            dialog->setMessage("Aah! No more " + weap->weaponName()+ "\nRUN AWAY!");
+            dialog->setMessage("No more " + weap->bulletName()+ "!\nRUN AWAY!");
             addLocalComponent(dialog);
         }
     });

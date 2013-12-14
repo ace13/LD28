@@ -1,4 +1,5 @@
 Name: A basic pistol
+Bullet Name: bullets
 
 Weapon Sprite: Pistol.png
 Magazine Sprite: Pistol-magazine.png
