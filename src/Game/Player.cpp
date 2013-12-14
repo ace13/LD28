@@ -1,4 +1,5 @@
 #include "Player.hpp"
+#include "Weapon.hpp"
 #include "../Resources.hpp"
 
 #include <Kunlaboro/EntitySystem.hpp>
@@ -15,7 +16,7 @@ enum Move
     M_Shift = 16
 };
 
-Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(*Resources::Texture_Player, 2, 2), mTime(0), mPressed(0)
+Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(Resources::Texture_Player, 2, 2), mTime(0), mPressed(0), mWeapon(nullptr)
 {
 }
 
@@ -30,9 +31,14 @@ void Player::addedToEntity()
     if (response.handled)
         gameView = boost::any_cast<sf::View*>(response.payload);
 
-    requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
+    requestMessage("Is the game running?", [](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = true; });
+
+    requestMessage("Event.Update", [this, gameView](const Kunlaboro::Message& msg)
     {
         float dt = boost::any_cast<float>(msg.payload);
+
+        auto curPos = gameView->getCenter();
+        gameView->move((mPosition - curPos) * dt * 2.f);
 
         sf::Vector2f diff((mPressed & M_D)/M_D - (mPressed & M_A)/M_A, (mPressed & M_S)/M_S - (mPressed & M_W)/M_W);
         float len = std::min(sqrt(diff.x * diff.x + diff.y * diff.y), 1.f);
@@ -47,18 +53,15 @@ void Player::addedToEntity()
 
         mTime += dt;
     });
-    requestMessage("Event.Draw", [this, gameView](const Kunlaboro::Message& msg)
+    requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
         auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
-
-        auto curPos = gameView->getCenter();
-        gameView->move((mPosition - curPos) / gCameraFloat);
 
         ///\TODO Draw a background of some kind
         sf::RectangleShape shape(sf::Vector2f(100, 100));
         target.draw(shape);
 
-        sf::Sprite sprite(*Resources::Texture_Player);
+        sf::Sprite sprite(Resources::Texture_Player);
         sprite.setTextureRect(mSheet.getRect((int)mTime % 2, (int)mTime / 2));
         sprite.setOrigin(sprite.getTextureRect().width / 2, sprite.getTextureRect().height / 2);
         sprite.setPosition(mPosition);
@@ -68,6 +71,49 @@ void Player::addedToEntity()
         // This is an animation, dig it?
         if (mTime > 4)
             mTime -= 4;
+    });
+
+    requestMessage("Event.DrawUi", [this](const Kunlaboro::Message& msg)
+    {
+        auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
+
+        if (mWeapon)
+        {
+            sf::Sprite weap(mWeapon->weaponTexture());
+            weap.move(5, 5);
+            target.draw(weap);
+
+            sf::Text weapName(mWeapon->weaponName(), Resources::Font_Dosis);
+            weapName.move(weap.getTexture()->getSize().x + 10, 5);
+            target.draw(weapName);
+
+            weap.move(mWeapon->weaponTexture().getSize().x + 10, mWeapon->weaponTexture().getSize().y);
+            weap.move(0, mWeapon->magazineTexture().getSize().y / -2.f);
+            weap.setTexture(mWeapon->magazineTexture(), true);
+
+            for (int i = 0; i < mWeapon->magazinesLeft(); ++i)
+            {
+                target.draw(weap);
+
+                weap.move(mWeapon->magazineTexture().getSize().x + 4, 0);
+            }
+
+            weap.setTexture(mWeapon->bulletTexture(), true);
+
+            for (int i = 0; i < mWeapon->bulletsLeft(); ++i)
+            {
+                target.draw(weap);
+
+                weap.move(mWeapon->bulletTexture().getSize().x + 2, 0);
+            }
+        }
+    });
+    requestComponent("Game.Weapon", [this](const Kunlaboro::Message& msg)
+    {
+        if (msg.type == Kunlaboro::Type_Create)
+            mWeapon = dynamic_cast<Weapon*>(msg.sender);
+        else
+            mWeapon = nullptr;
     });
 
     requestMessage("Event.Key.W", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_W; else mPressed &= ~M_W; });
@@ -89,8 +135,12 @@ void Player::addedToEntity()
     requestMessage("Event.Key.Escape", [this](const Kunlaboro::Message& msg)
     {
         bool pressed = boost::any_cast<bool>(msg.payload);
+        if (!pressed)
+            return;
 
-        if (pressed)
+        auto response = sendGlobalQuestion("Is the game paused?");
+
+        if (!response.handled || !boost::any_cast<bool>(response.payload))
         {
             auto& sys = *getEntitySystem();
             auto ent = sys.createEntity();

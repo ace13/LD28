@@ -23,4 +23,6 @@ private:
     std::list<std::pair<std::string, std::function<void()> > > mEntries;
     sf::Vector2f mMousePos, mScreenCenter;
     float mTime;
+
+    bool mInGame;
 };

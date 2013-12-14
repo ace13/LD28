@@ -2,6 +2,8 @@
 
 #include <Kunlaboro/Component.hpp>
 
+namespace sf { class Texture; }
+
 class Weapon : public Kunlaboro::Component
 {
 public:
@@ -10,16 +12,23 @@ public:
 
     void addedToEntity();
 
+    inline std::string weaponName() const { return Weapon::mName; }
+
+    inline sf::Texture& weaponTexture() const { return *mTexture; }
+    inline sf::Texture& bulletTexture() const { return *mBulletTexture; }
+    inline sf::Texture& magazineTexture() const { return *mMagazineTexture; }
+
+    inline int magazinesLeft() const { return mMags; }
+    inline int bulletsLeft() const { return mBulletsInCurrentMag; }
+
 private:
     std::string mName;
 
-    float mDamage;
-    float mSpread;
-    float mFireRate;
+    sf::Texture *mTexture, *mMagazineTexture, *mBulletTexture;
 
-    int mMags;
-    int mBulletsPerMag;
-    int mBulletsInCurrentMag;
+    float mDamage, mSpread, mFireRate;
+
+    int mMags, mBulletsPerMag, mBulletsInCurrentMag, mBulletsPerShot;
 
 
 };

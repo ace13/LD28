@@ -57,8 +57,8 @@ int Engine::mainLoop()
     auto keyToString = [](sf::Keyboard::Key k) -> std::string {
         switch(k)
         {
-        KEY(W) KEY(A) KEY(S) KEY(D)
-        KEY(Up) KEY(Down) KEY(Left) KEY(Right)
+        KEY(W) KEY(A) KEY(S) KEY(D) KEY(E) KEY(R)
+        //KEY(Up) KEY(Down) KEY(Left) KEY(Right)
         KEY(Space) KEY(Return) KEY(Escape)
         KEY(LShift)
 
@@ -73,18 +73,19 @@ int Engine::mainLoop()
     sf::Event ev;
     sf::Clock timer;
 
-    Kunlaboro::Message msg(Kunlaboro::Type_Message, nullptr);
-    mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Engine.Init"), msg);
+    mSystem.sendGlobalMessage("Event.Engine.Init");
 
     while (mWindow.isOpen())
     {
-        float dt = timer.restart().asSeconds();
+        float dt = std::min(timer.restart().asSeconds(), 0.5f);
+
         while (mWindow.pollEvent(ev))
         {
             switch(ev.type)
             {       
             case sf::Event::Closed:
                 {
+                    Kunlaboro::Message msg(Kunlaboro::Type_Message, nullptr);
                     msg.payload = nullptr;
                     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Window.Closed"), msg);
                     if (!msg.handled)
@@ -99,6 +100,7 @@ int Engine::mainLoop()
             case sf::Event::KeyPressed:
             case sf::Event::KeyReleased:
                 {
+                    Kunlaboro::Message msg(Kunlaboro::Type_Message, nullptr);
                     msg.payload = (ev.type == sf::Event::KeyPressed);
                     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Key." + keyToString(ev.key.code)), msg);
                 } break;
@@ -108,6 +110,7 @@ int Engine::mainLoop()
                 {
                     bool pressed = ev.type == sf::Event::MouseButtonPressed;
 
+                    Kunlaboro::Message msg(Kunlaboro::Type_Message, nullptr);
                     msg.payload = std::tuple<sf::Mouse::Button, sf::Vector2f, bool>(ev.mouseButton.button, sf::Vector2f(ev.mouseButton.x, ev.mouseButton.y), pressed);
                     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Mouse.Click"), msg);
                 } break;
@@ -115,6 +118,7 @@ int Engine::mainLoop()
             case sf::Event::MouseMoved:
                 {
                     auto pos = sf::Vector2f(ev.mouseMove.x, ev.mouseMove.y);
+                    Kunlaboro::Message msg(Kunlaboro::Type_Message, nullptr);
                     msg.payload = pos;
                     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Mouse.Move"), msg);
                     {
@@ -127,6 +131,8 @@ int Engine::mainLoop()
 
                         msg.payload = sf::Vector2f(vR.left + vR.width * (pos.x / wS.x), vR.top + vR.height * (pos.y / wS.y));
                     }
+                    msg.sender = nullptr;
+                    msg.handled = false;
                     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Mouse.MoveGame"), msg);
                 } break;
             }

@@ -23,7 +23,7 @@ void Countdown::addedToEntity()
 
 void Countdown::drawUi(const Kunlaboro::Message& msg)
 {
-    sf::Text string("I am a string! :D", *Resources::Font_Dosis);
+    sf::Text string("I am a string! :D", Resources::Font_Dosis);
 
     int diff = ::difftime(Target, mCurrent);
 

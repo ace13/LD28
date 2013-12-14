@@ -3,6 +3,8 @@
 #include "Game/Countdown.hpp"
 #include "Game/Menu.hpp"
 #include "Game/Player.hpp"
+#include "Game/World.hpp"
+#include "Game/Weapon.hpp"
 
 #include <Kunlaboro/EntitySystem.hpp>
 
@@ -18,6 +20,8 @@ void registerComponents(Kunlaboro::EntitySystem& sys)
     sys.registerComponent<Countdown>("Game.Countdown");
     sys.registerComponent<Menu>("Game.Menu");
     sys.registerComponent<Player>("Game.Player");
+    sys.registerComponent<World>("Game.World");
+    sys.registerComponent<Weapon>("Game.Weapon");
 }
 
 int main(int argc, char** argv)

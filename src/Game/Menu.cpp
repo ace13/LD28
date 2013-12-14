@@ -8,18 +8,9 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Window/Mouse.hpp>
 
-Menu::Menu() : Kunlaboro::Component("Game.Menu"), mTime(0)
+Menu::Menu() : Kunlaboro::Component("Game.Menu"), mTime(0), mInGame(false)
 {
-    mEntries.push_back(std::make_pair("Start Game", [this]()
-    {
-        auto& sys = *getEntitySystem();
-        
-        auto ent = sys.createEntity();
-        sys.addComponent(ent, "Game.Player");
-
-        sys.destroyEntity(getOwnerId());
-    }));
-    mEntries.push_back(std::make_pair("End Game", [this]() { sendGlobalMessage("ExitGame"); }));
+    
 }
 
 Menu::~Menu()
@@ -28,19 +19,58 @@ Menu::~Menu()
 
 void Menu::addedToEntity()
 {
-    requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
+    ///\TODO Put initialization somewhere else?
+    {
+        auto& sys = *getEntitySystem();
+        Kunlaboro::Message question(Kunlaboro::Type_Message, this);
+        sys.sendGlobalMessage(sys.getMessageRequestId(Kunlaboro::Reason_Message, "Is the game running?"), question);
+
+        if (question.handled && boost::any_cast<bool>(question.payload))
+        {
+            mInGame = true;
+
+            mEntries.push_back(std::make_pair("Continue Game", [this, &sys]()
+            {
+                sys.destroyEntity(getOwnerId());
+            }));
+            mEntries.push_back(std::make_pair("End Game", [this]() { sendGlobalMessage("ExitGame"); }));
+        }
+        else
+        {
+            mInGame = false;
+
+            mEntries.push_back(std::make_pair("Start Game", [this]()
+            {
+                auto& sys = *getEntitySystem();
+        
+                auto ent = sys.createEntity();
+                sys.addComponent(ent, "Game.Player");
+                sys.addComponent(ent, "Game.Weapon");
+
+                sys.destroyEntity(getOwnerId());
+            }));
+            mEntries.push_back(std::make_pair("End Game", [this]() { sendGlobalMessage("ExitGame"); }));
+        }
+    }
+
+    requestMessage("Is the game paused?", [](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = true; });
+    requestMessage("Event.Update", [this](Kunlaboro::Message& msg)
     {
         update(boost::any_cast<float>(msg.payload));
+
+        if (mInGame)
+            msg.handled = true;
     });
+    changeRequestPriority("Event.Update", -1);
     requestMessage("Event.DrawUi", [this](const Kunlaboro::Message& msg)
     {
         drawUi(*boost::any_cast<sf::RenderTarget*>(msg.payload));
     });
-    requestMessage("Event.Mouse.Click", [this](const Kunlaboro::Message& msg)
+    requestMessage("Event.Mouse.Click", [this](Kunlaboro::Message& msg)
     {
         auto data = boost::any_cast<std::tuple<sf::Mouse::Button, sf::Vector2f, bool> >(msg.payload); 
 
-        sf::Text string("MENU ENTRY GO HERE", *Resources::Font_Dosis);
+        sf::Text string("MENU ENTRY GO HERE", Resources::Font_Dosis);
 
         string.setPosition(mScreenCenter);
 
@@ -62,12 +92,24 @@ void Menu::addedToEntity()
 
             tuple.second();
         }
+        
+        msg.handled = true;
     });
-    requestMessage("Event.Mouse.Move", [this](const Kunlaboro::Message& msg)
+    changeRequestPriority("Event.Mouse.Click", -1);
+    requestMessage("Event.Mouse.Move", [this](Kunlaboro::Message& msg)
     {
+        msg.handled = true;
+
         auto pos = boost::any_cast<sf::Vector2f>(msg.payload);
         mMousePos = pos;
     });
+    changeRequestPriority("Event.Mouse.Move", -1);
+
+    if (mInGame)
+    {
+        requestMessage("Event.Mouse.MoveGame", [](Kunlaboro::Message& msg) { msg.handled = true; });
+        changeRequestPriority("Event.Mouse.MoveGame", -1);
+    }
 }
 
 void Menu::update(float dt)
@@ -77,7 +119,14 @@ void Menu::update(float dt)
 
 void Menu::drawUi(sf::RenderTarget& target)
 {
-    sf::Text string(Resources::String_Name, *Resources::Font_Dosis);
+    if (mInGame)
+    {
+        sf::RectangleShape shape(target.getView().getSize());
+        shape.setFillColor(sf::Color(0,0,0, std::min(mTime, 0.75f)*255));
+        target.draw(shape);
+    }
+
+    sf::Text string(Resources::String_Name, Resources::Font_Dosis);
 
     mScreenCenter = target.getView().getCenter();
 
