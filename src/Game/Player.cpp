@@ -168,4 +168,24 @@ void Player::addedToEntity()
             sys.addComponent(ent, "Game.Menu");
         }
     });
+
+    requestMessage("Did I hit something?", [this](Kunlaboro::Message& msg)
+    {
+        const auto dist = [](const sf::Vector2f& a, const sf::Vector2f& b) -> float
+        {
+            sf::Vector2f diff = b - a;
+            return sqrt(diff.x * diff.x + diff.y * diff.y);
+        };
+
+        if (msg.sender->getOwnerId() == getOwnerId()) return; 
+        
+        auto pos = boost::any_cast<sf::Vector2f>(msg.payload);
+        float diff = dist(mPosition, pos);
+
+        if (diff < 32)
+        {
+            msg.payload = true;
+            msg.handled = true;
+        }
+    });
 }
