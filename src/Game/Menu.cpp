@@ -170,7 +170,6 @@ void Menu::drawUi(sf::RenderTarget& target)
         else
             string.setColor(sf::Color::White);
 
-
         target.draw(string);
 
         string.move(0, rect.height + 16);
