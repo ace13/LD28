@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/View.hpp>
 
 namespace Kunlaboro { class EntitySystem; }
 
@@ -15,4 +16,7 @@ public:
 private:
     Kunlaboro::EntitySystem& mSystem;
     sf::RenderWindow mWindow;
+
+    sf::View mGameView;
+    sf::View mUiView;
 };
