@@ -1,0 +1,14 @@
+Ludum Dare #28
+
+Theme: You only get one
+
+
+Ideas:
+ - Black Friday TD / "Take only one!"
+ - One button game of some kind
+   - Fighting game w/ one move
+   - Robot Unicorn Attack like
+   - 5 second minigames, one button only
+ - Maze game, you only get one look at the maze
+ - Treasure finding, only only get the first one you find
+
