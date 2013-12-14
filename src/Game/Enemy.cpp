@@ -1,8 +1,11 @@
 #include "Enemy.hpp"
+#include "Weapon.hpp"
+#include "Dialog.hpp"
 #include "../Resources.hpp"
 #include <tuple>
 #include <random>
 #include <SFML/Graphics/Sprite.hpp>
+#include <Kunlaboro/EntitySystem.hpp>
 
 Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mPosition(100, 100), mHealth(100), mArmor(1), mTime(0), mLastAng(0)
 {
@@ -67,7 +70,28 @@ void Enemy::addedToEntity()
         target.draw(enemy);
     });
 
+    requestMessage("Where am I?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mPosition; }, true);
     requestMessage("Where am I shooting?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = std::make_tuple(mPosition, mLastFire); });
 
-    requestComponent("Game.Weapon", [this](const Kunlaboro::Message& msg) { });
+    requestComponent("Game.Weapon", [this](const Kunlaboro::Message& msg)
+    {
+        auto weap = dynamic_cast<Weapon*>(msg.sender);
+
+        if (msg.type == Kunlaboro::Type_Create)
+        {
+            auto& sys = *getEntitySystem();
+
+            auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
+            dialog->setMessage("Eat " + weap->weaponName() + " and die!");
+            addLocalComponent(dialog);
+        }
+        else
+        {
+            auto& sys = *getEntitySystem();
+
+            auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
+            dialog->setMessage("Aah! No more " + weap->weaponName()+ "\nRUN AWAY!");
+            addLocalComponent(dialog);
+        }
+    });
 }

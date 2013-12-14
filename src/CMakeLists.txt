@@ -36,14 +36,16 @@ set(Game_SOURCES
 
     Game/Player.hpp
     Game/Player.cpp
+    Game/Enemy.hpp
+    Game/Enemy.cpp
 
     Game/Weapon.hpp
     Game/Weapon.cpp
     Game/Bullet.hpp
     Game/Bullet.cpp
 
-    Game/Enemy.hpp
-    Game/Enemy.cpp
+    Game/Dialog.hpp
+    Game/Dialog.cpp
 )
 
 source_group(Engine FILES ${Engine_SOURCES})
