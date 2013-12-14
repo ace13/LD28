@@ -96,9 +96,7 @@ int Engine::mainLoop()
             case sf::Event::KeyPressed:
             case sf::Event::KeyReleased:
                 {
-                    bool pressed = ev.type == sf::Event::KeyPressed;
-
-                    msg.payload = pressed;
+                    msg.payload = (ev.type == sf::Event::KeyPressed);
                     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Key." + keyToString(ev.key.code)), msg);
                 } break;
 

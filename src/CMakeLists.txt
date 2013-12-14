@@ -13,17 +13,23 @@ link_directories(
 set(Engine_SOURCES
     Engine.hpp
     Engine.cpp
+
     Resources.hpp
     Resources.cpp
+
+    SpriteSheet.hpp
+    SpriteSheet.cpp
 )
 
 set(Game_SOURCES
     Game/Menu.hpp
     Game/Menu.cpp
 
-
     Game/Countdown.hpp
     Game/Countdown.cpp
+
+    Game/Player.hpp
+    Game/Player.cpp
 )
 
 source_group(Engine FILES ${Engine_SOURCES})
