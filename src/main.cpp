@@ -2,6 +2,7 @@
 #include "Resources.hpp"
 #include "Game/Countdown.hpp"
 #include "Game/Menu.hpp"
+#include "Game/Player.hpp"
 
 #include <Kunlaboro/EntitySystem.hpp>
 
@@ -16,6 +17,7 @@ void registerComponents(Kunlaboro::EntitySystem& sys)
 {
     sys.registerComponent<Countdown>("Game.Countdown");
     sys.registerComponent<Menu>("Game.Menu");
+    sys.registerComponent<Player>("Game.Player");
 }
 
 int main(int argc, char** argv)
@@ -42,6 +44,7 @@ int main(int argc, char** argv)
 
     auto ent = sys.createEntity();
     sys.addComponent(ent, "Game.Menu");
+    sys.addComponent(ent, "Game.Player");
 
     return eng.mainLoop();
 }

@@ -13,5 +13,6 @@ Ideas:
  - Treasure finding, only get the first one you find
  - Shooting games with one weapon / ammo
  	- Hunting game, you only get one bow
- 	- Top down schmup, you can only carry one weapon
+ 	- Top down schmup, you can only carry one weapon        <---- DO THIS ONE :D
  	- Cross dangerous area before town, only one arrow
+ - Roguelike / only one pixel per entity

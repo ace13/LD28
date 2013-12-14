@@ -14,6 +14,9 @@ public:
         requestMessage("Event.Window.Resized", &EngineHandler::resized);
         changeRequestPriority("Event.Window.Resized", -42);
         requestMessage("ExitGame", [this](const Kunlaboro::Message& msg) { mWin.close(); });
+
+        requestMessage("Get.GameView", [this](Kunlaboro::Message& msg) { msg.payload = &mGame; msg.handled = true; });
+        requestMessage("Get.UiView", [this](Kunlaboro::Message& msg) { msg.payload = &mUi; msg.handled = true; });
     }
 
     void resized(const Kunlaboro::Message& msg)
@@ -24,13 +27,13 @@ public:
         mUi.setCenter((sf::Vector2f)size / 2.f);
 
         auto gSize = mGame.getSize();
-        float aspect = size.x / size.y;
+        float aspect = (float)size.x / size.y;
 
         mGame.setSize(gSize.y * aspect, gSize.y);
     }
 
 private:
-    sf::View& mUi, mGame;
+    sf::View &mUi, &mGame;
     sf::RenderWindow& mWin;
 };
 
@@ -67,8 +70,6 @@ int Engine::mainLoop()
 
     sf::Event ev;
     sf::Clock timer;
-
-    mGameView.setSize(0, 1024);
 
     Kunlaboro::Message msg(Kunlaboro::Type_Message, nullptr);
     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Engine.Init"), msg);

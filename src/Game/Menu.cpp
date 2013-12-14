@@ -24,7 +24,7 @@ void Menu::addedToEntity()
     });
     requestMessage("Event.DrawUi", [this](const Kunlaboro::Message& msg)
     {
-        drawUi(*boost::any_cast<sf::RenderTarget*>(msg.payload));
+        //drawUi(*boost::any_cast<sf::RenderTarget*>(msg.payload));
     });
     requestMessage("Event.Mouse.Click", [this](const Kunlaboro::Message& msg)
     {
@@ -81,10 +81,15 @@ void Menu::drawUi(sf::RenderTarget& target)
         string.setOrigin(rect.width / 2.f, rect.height / 2.f);
         rect = string.getGlobalBounds();
 
-        if (rect.contains(mMousePos))
+        bool hovered = rect.contains(mMousePos);
+
+        if (hovered)
+        {
             string.setColor(sf::Color(128, 196, 0));
+        }
         else
             string.setColor(sf::Color::White);
+
 
         target.draw(string);
 
