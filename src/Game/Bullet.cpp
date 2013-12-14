@@ -57,6 +57,12 @@ void Bullet::addedToEntity()
         mLifeTime += dt;
         if (mLifeTime > 2.f)
             getEntitySystem()->destroyComponent(this);
+
+        auto reply = sendGlobalQuestion("Did I hit something?", mPosition);
+        if (reply.handled)
+        {
+            getEntitySystem()->destroyComponent(this);
+        }
     });
 
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
