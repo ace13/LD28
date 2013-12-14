@@ -1,8 +1,8 @@
 Name: Banana
 
-Weapon Sprite: bananabunch.png
-Bullet Sprite: banana-bullet.png
-Magazine Sprite: banana.png
+Weapon Sprite: Bananabunch.png
+Bullet Sprite: Banana-bullet.png
+Magazine Sprite: Banana.png
 
 Type: Pistol
 Bullets Per Shot: 1
