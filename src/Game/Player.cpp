@@ -108,6 +108,7 @@ void Player::addedToEntity()
             }
         }
     });
+
     requestComponent("Game.Weapon", [this](const Kunlaboro::Message& msg)
     {
         if (msg.type == Kunlaboro::Type_Create)

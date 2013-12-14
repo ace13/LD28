@@ -66,6 +66,7 @@ void Menu::addedToEntity()
     {
         drawUi(*boost::any_cast<sf::RenderTarget*>(msg.payload));
     });
+    changeRequestPriority("Event.DrawUi", 1);
     requestMessage("Event.Mouse.Click", [this](Kunlaboro::Message& msg)
     {
         auto data = boost::any_cast<std::tuple<sf::Mouse::Button, sf::Vector2f, bool> >(msg.payload); 
