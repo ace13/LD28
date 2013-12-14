@@ -19,9 +19,7 @@ void Weapon::addedToEntity()
     { // Weapon Setup
         std::random_device dev;
 
-        std::uniform_int_distribution<int> weapon(0, Resources::Data_Weapons.size() - 1);
-
-        DataFile& file = Resources::Data_Weapons[weapon(dev)];
+        DataFile& file = Resources::Data_Weapons[std::uniform_int_distribution<int>(0, Resources::Data_Weapons.size() - 1)(dev)];
 
         mName = file["Name"];
         mBulletName = file["Bullet Name"];
@@ -33,7 +31,7 @@ void Weapon::addedToEntity()
         mBulletsPerMag = atoi(file["Bullets"].c_str());
         mBulletsPerShot = atoi(file["Bullets Per Shot"].c_str());
 
-        mBulletsInCurrentMag = mBulletsPerMag;
+        mBulletsInCurrentMag = std::uniform_int_distribution<int>(0, mBulletsPerMag)(dev);
 
         mTexture = &Resources::Texture_Weapons[file["Weapon Sprite"]];
         mBulletTexture = &Resources::Texture_Weapons[file["Bullet Sprite"]];
