@@ -3,6 +3,7 @@
 #include <random>
 #include <tuple>
 #include <SFML/Window/Mouse.hpp>
+#include <Kunlaboro/EntitySystem.hpp>
 
 Weapon::Weapon() : Kunlaboro::Component("Game.Weapon")
 {
@@ -23,12 +24,12 @@ void Weapon::addedToEntity()
         DataFile& file = Resources::Data_Weapons[weapon(dev)];
 
         mName = file["Name"];
-        mDamage = std::uniform_real_distribution<float>(atof(file["Min Damage"].c_str()), atof(file["Max Damage"].c_str()))(dev);
-        mSpread = std::uniform_real_distribution<float>(atof(file["Min Spread"].c_str()), atof(file["Max Spread"].c_str()))(dev);
-        mFireRate = std::uniform_real_distribution<float>(atof(file["Min Rate"].c_str()), atof(file["Max Rate"  ].c_str()))(dev);
+        mDamage = atof(file["Damage"].c_str());
+        mSpread = atof(file["Spread"].c_str());
+        mFireRate = atof(file["Rate"].c_str());
     
-        mMags = std::uniform_int_distribution<int>(atoi(file["Min Mags"].c_str()), atoi(file["Max Mags"].c_str()))(dev);
-        mBulletsPerMag = std::uniform_int_distribution<int>(atoi(file["Min Bullets"].c_str()), atoi(file["Max Bullets"].c_str()))(dev);
+        mMags = atoi(file["Mags"].c_str());
+        mBulletsPerMag = atoi(file["Bullets"].c_str());
         mBulletsPerShot = atoi(file["Bullets Per Shot"].c_str());
 
         mBulletsInCurrentMag = mBulletsPerMag;
@@ -45,7 +46,14 @@ void Weapon::addedToEntity()
         if (std::get<0>(data) == sf::Mouse::Left && std::get<2>(data))
         {
             if (mBulletsInCurrentMag > 0)
+            {
                 --mBulletsInCurrentMag;
+
+                for (int i = 0; i < mBulletsPerShot; ++i)
+                {
+                    getEntitySystem()->addComponent(getOwnerId(), "Game.Bullet");
+                }
+            }
         }
     });
 
@@ -58,6 +66,15 @@ void Weapon::addedToEntity()
             mBulletsInCurrentMag = mBulletsPerMag;
             --mMags;
         }   
+    });
+
+    requestMessage("Event.Key.Q", [this](const Kunlaboro::Message& msg)
+    {
+        if (!boost::any_cast<bool>(msg.payload)) return;
+
+        ///\TODO Throw the weapon
+        printf("TODO: Throw weapon\n");
+        getEntitySystem()->destroyComponent(this);
     });
 
 }

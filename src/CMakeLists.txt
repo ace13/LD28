@@ -39,6 +39,8 @@ set(Game_SOURCES
 
     Game/Weapon.hpp
     Game/Weapon.cpp
+    Game/Bullet.hpp
+    Game/Bullet.cpp
 
     Game/Enemy.hpp
     Game/Enemy.cpp

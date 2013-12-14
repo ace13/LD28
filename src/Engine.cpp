@@ -57,7 +57,7 @@ int Engine::mainLoop()
     auto keyToString = [](sf::Keyboard::Key k) -> std::string {
         switch(k)
         {
-        KEY(W) KEY(A) KEY(S) KEY(D) KEY(E) KEY(R)
+        KEY(W) KEY(A) KEY(S) KEY(D) KEY(Q) KEY(E) KEY(R)
         //KEY(Up) KEY(Down) KEY(Left) KEY(Right)
         KEY(Space) KEY(Return) KEY(Escape)
         KEY(LShift)
@@ -74,7 +74,10 @@ int Engine::mainLoop()
     sf::Clock timer;
 
     mSystem.sendGlobalMessage("Event.Engine.Init");
-
+#ifdef _DEBUG
+    int fps = 0, frames = 0;
+    float frameTime = 0;
+#endif
     while (mWindow.isOpen())
     {
         float dt = std::min(timer.restart().asSeconds(), 0.5f);
@@ -151,7 +154,33 @@ int Engine::mainLoop()
 
         mSystem.sendGlobalMessage("Event.DrawUi", (sf::RenderTarget*)&mWindow);
         
+#ifdef _DEBUG
+        frames++;
+        frameTime += dt;
+        if (frameTime > 1)
+        {
+            frameTime -= 1;
+            fps = frames;
+            frames = 0;
+        }
+
+        {
+            sf::Text debugText("DEBUG", Resources::Font_Dosis, 16);
+            char tmp[256];
+            sprintf_s(tmp, "FPS: %i\nComponents: %i\nEntities: %i", fps, mSystem.numCom(), mSystem.numEnt());
+
+            debugText.setString(tmp);
+            auto rect = debugText.getLocalBounds();
+            debugText.setPosition(5, mUiView.getSize().y - rect.height - 10);
+
+            mWindow.draw(debugText);
+        }
+#endif
+
         mWindow.display();
+
+        if (dt < 1.f / 60.f)
+            sf::sleep(sf::milliseconds(1));
     }
 
     return 0;

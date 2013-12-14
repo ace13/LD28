@@ -16,7 +16,7 @@ enum Move
     M_Shift = 16
 };
 
-Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(Resources::Texture_Player, 2, 2), mTime(0), mPressed(0), mWeapon(nullptr)
+Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(Resources::Texture_Player, 4, 2), mTime(0), mPressed(0), mWeapon(nullptr)
 {
 }
 
@@ -51,7 +51,7 @@ void Player::addedToEntity()
             mPosition += diff * dt * gMoveSpeed * (1.f + (mPressed & M_Shift)/M_Shift * 3.f);
         }
 
-        mTime += dt;
+        mTime += dt * 2;
     });
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
@@ -62,7 +62,7 @@ void Player::addedToEntity()
         target.draw(shape);
 
         sf::Sprite sprite(Resources::Texture_Player);
-        sprite.setTextureRect(mSheet.getRect((int)mTime % 2, (int)mTime / 2));
+        sprite.setTextureRect(mSheet.getRect((int)mTime % 4, (mPressed & M_Shift) / M_Shift));
         sprite.setOrigin(sprite.getTextureRect().width / 2, sprite.getTextureRect().height / 2);
         sprite.setPosition(mPosition);
         sprite.setRotation(mAngle); 
@@ -88,7 +88,7 @@ void Player::addedToEntity()
             target.draw(weapName);
 
             weap.move(mWeapon->weaponTexture().getSize().x + 10, mWeapon->weaponTexture().getSize().y);
-            weap.move(0, mWeapon->magazineTexture().getSize().y / -2.f);
+            weap.move(0, mWeapon->magazineTexture().getSize().y / -3.f);
             weap.setTexture(mWeapon->magazineTexture(), true);
 
             for (int i = 0; i < mWeapon->magazinesLeft(); ++i)
@@ -113,7 +113,9 @@ void Player::addedToEntity()
         if (msg.type == Kunlaboro::Type_Create)
             mWeapon = dynamic_cast<Weapon*>(msg.sender);
         else
+        {
             mWeapon = nullptr;
+        }
     });
 
     requestMessage("Event.Key.W", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_W; else mPressed &= ~M_W; });
@@ -121,6 +123,14 @@ void Player::addedToEntity()
     requestMessage("Event.Key.S", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_S; else mPressed &= ~M_S; });
     requestMessage("Event.Key.D", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_D; else mPressed &= ~M_D; });
     requestMessage("Event.Key.LShift", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_Shift; else mPressed &= ~M_Shift; });
+    requestMessage("Event.Key.E", [this](const Kunlaboro::Message& msg)
+    {
+        if (!boost::any_cast<bool>(msg.payload)) return;
+
+        printf("TODO: Actually pick weapons up\n");
+        if (!mWeapon)
+            getEntitySystem()->addComponent(getOwnerId(), "Game.Weapon");
+    });
 
     requestMessage("Event.Mouse.MoveGame", [this](const Kunlaboro::Message& msg)
     {

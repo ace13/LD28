@@ -21,6 +21,9 @@ public:
     inline int magazinesLeft() const { return mMags; }
     inline int bulletsLeft() const { return mBulletsInCurrentMag; }
 
+    inline float getDamage() const { return mDamage; }
+    inline float getSpread() const { return mSpread; }
+
 private:
     std::string mName;
 

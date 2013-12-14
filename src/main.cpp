@@ -5,6 +5,7 @@
 #include "Game/Player.hpp"
 #include "Game/World.hpp"
 #include "Game/Weapon.hpp"
+#include "Game/Bullet.hpp"
 
 #include <Kunlaboro/EntitySystem.hpp>
 
@@ -22,6 +23,7 @@ void registerComponents(Kunlaboro::EntitySystem& sys)
     sys.registerComponent<Player>("Game.Player");
     sys.registerComponent<World>("Game.World");
     sys.registerComponent<Weapon>("Game.Weapon");
+    sys.registerComponent<Bullet>("Game.Bullet");
 }
 
 int main(int argc, char** argv)
@@ -29,6 +31,16 @@ int main(int argc, char** argv)
     try
     {
         Resources::initialize();
+
+        Kunlaboro::EntitySystem sys;
+        registerComponents(sys);
+
+        Engine eng(sys);
+
+        auto ent = sys.createEntity();
+        sys.addComponent(ent, "Game.Menu");
+
+        return eng.mainLoop();
     }
     catch (std::runtime_error err)
     {
@@ -40,14 +52,4 @@ int main(int argc, char** argv)
 
         return 1;
     }
-
-    Kunlaboro::EntitySystem sys;
-    registerComponents(sys);
-
-    Engine eng(sys);
-
-    auto ent = sys.createEntity();
-    sys.addComponent(ent, "Game.Menu");
-
-    return eng.mainLoop();
 }

@@ -14,6 +14,9 @@ public:
 
     void addedToEntity();
 
+    inline sf::Vector2f getPosition() const { return mPosition; }
+    inline float getAngle() const { return mAngle; }
+
 private:
     Weapon* mWeapon;
     char mPressed;
