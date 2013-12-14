@@ -39,42 +39,36 @@ void Weapon::addedToEntity()
         mMagazineTexture = &Resources::Texture_Weapons[file["Magazine Sprite"]];
     }
 
-    requestMessage("Event.Mouse.Click", [this](const Kunlaboro::Message& msg)
+    requestMessage("Fire ze missiles!", [this](const Kunlaboro::Message& msg)
     {
-        auto data = boost::any_cast<std::tuple<sf::Mouse::Button, sf::Vector2f, bool> >(msg.payload);
-
-        if (std::get<0>(data) == sf::Mouse::Left && std::get<2>(data))
+        if (mBulletsInCurrentMag > 0)
         {
-            if (mBulletsInCurrentMag > 0)
-            {
-                --mBulletsInCurrentMag;
+            --mBulletsInCurrentMag;
 
-                for (int i = 0; i < mBulletsPerShot; ++i)
-                {
-                    getEntitySystem()->addComponent(getOwnerId(), "Game.Bullet");
-                }
+            for (int i = 0; i < mBulletsPerShot; ++i)
+            {
+                getEntitySystem()->addComponent(getOwnerId(), "Game.Bullet");
             }
         }
-    });
+    }, true);
 
-    requestMessage("Event.Key.R", [this](const Kunlaboro::Message& msg)
+    requestMessage("More ammo!", [this](const Kunlaboro::Message& msg)
     {
-        auto pressed = boost::any_cast<bool>(msg.payload);
-
-        if (pressed && mMags > 0)
+        if (mMags > 0)
         {
             mBulletsInCurrentMag = mBulletsPerMag;
             --mMags;
         }   
-    });
+    }, true);
 
-    requestMessage("Event.Key.Q", [this](const Kunlaboro::Message& msg)
+    requestMessage("Throw it to the ground!", [this](const Kunlaboro::Message& msg)
     {
-        if (!boost::any_cast<bool>(msg.payload)) return;
-
         ///\TODO Throw the weapon
         printf("TODO: Throw weapon\n");
         getEntitySystem()->destroyComponent(this);
-    });
+    }, true);
 
+    requestMessage("What am I holding?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mName; }, true);
+    requestMessage("Such bullets?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mBulletsInCurrentMag; }, true);
+    requestMessage("Out of mags?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mMags; }, true);
 }

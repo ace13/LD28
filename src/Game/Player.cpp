@@ -57,10 +57,6 @@ void Player::addedToEntity()
     {
         auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
 
-        ///\TODO Draw a background of some kind
-        sf::RectangleShape shape(sf::Vector2f(100, 100));
-        target.draw(shape);
-
         sf::Sprite sprite(Resources::Texture_Player);
         sprite.setTextureRect(mSheet.getRect((int)mTime % 4, (mPressed & M_Shift) / M_Shift));
         sprite.setOrigin(sprite.getTextureRect().width / 2, sprite.getTextureRect().height / 2);
@@ -119,6 +115,8 @@ void Player::addedToEntity()
         }
     });
 
+    requestMessage("Where am I shooting?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = std::make_tuple(mPosition, mAngle); }, true);
+
     requestMessage("Event.Key.W", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_W; else mPressed &= ~M_W; });
     requestMessage("Event.Key.A", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_A; else mPressed &= ~M_A; });
     requestMessage("Event.Key.S", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mPressed |= M_S; else mPressed &= ~M_S; });
@@ -132,6 +130,9 @@ void Player::addedToEntity()
         if (!mWeapon)
             getEntitySystem()->addComponent(getOwnerId(), "Game.Weapon");
     });
+    requestMessage("Event.Key.Q", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) sendMessage("Throw it to the ground!"); });
+    requestMessage("Event.Key.R", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) sendMessage("More ammo!"); });
+
 
     requestMessage("Event.Mouse.MoveGame", [this](const Kunlaboro::Message& msg)
     {
@@ -141,6 +142,14 @@ void Player::addedToEntity()
         float ang = atan2(pos.y - mPosition.y, pos.x - mPosition.x);
 
         mAngle = ang * (180.f/3.1415f);
+    });
+
+    requestMessage("Event.Mouse.Click", [this](const Kunlaboro::Message& msg)
+    {
+        auto data = boost::any_cast<std::tuple<sf::Mouse::Button, sf::Vector2f, bool> >(msg.payload);
+
+        if (std::get<0>(data) == sf::Mouse::Left && std::get<2>(data))
+            sendMessage("Fire ze missiles!");
     });
 
     requestMessage("Event.Key.Escape", [this](const Kunlaboro::Message& msg)

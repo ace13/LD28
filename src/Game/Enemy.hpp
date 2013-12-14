@@ -1,6 +1,8 @@
 #pragma once
 
+#include "../SpriteSheet.hpp"
 #include <Kunlaboro/Component.hpp>
+#include <SFML/System/Vector2.hpp>
 
 class Enemy : public Kunlaboro::Component
 {
@@ -13,6 +15,7 @@ public:
 
 
 private:
-    float mHealth;
-    float mArmor;
+    SpriteSheet mSheet;
+    float mHealth, mArmor, mTime, mLastFire, mLastAng;
+    sf::Vector2f mPosition;
 };

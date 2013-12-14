@@ -30,10 +30,17 @@ void Bullet::addedToEntity()
     }
 
     { // Read player data
-        auto player = dynamic_cast<Player*>(getEntitySystem()->getAllComponentsOnEntity(getOwnerId(), "Game.Player")[0]);
+        auto reply = sendQuestion("Where am I shooting?");
+        if (!reply.handled)
+        {
+            getEntitySystem()->destroyComponent(this);
+            return;
+        }
 
-        mPosition = player->getPosition();
-        mAngle = player->getAngle() * (3.1415f / 180);
+        auto data = boost::any_cast<std::tuple<sf::Vector2f, float> >(reply.payload);
+
+        mPosition = std::get<0>(data);
+        mAngle = std::get<1>(data) * (3.1415f / 180);
 
         std::random_device dev;
         std::uniform_real_distribution<float> rs(-spread, spread);
