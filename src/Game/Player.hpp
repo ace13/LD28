@@ -13,8 +13,8 @@ public:
     void addedToEntity();
 
 private:
-    float mTime;
-    sf::Vector2f mPosition;
-    sf::Vector2f mDiff;
+    char mPressed;
+    float mTime, mAngle;
+    sf::Vector2f mPosition, mMouse;
     SpriteSheet mSheet;
 };

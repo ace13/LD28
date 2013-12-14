@@ -44,7 +44,6 @@ int main(int argc, char** argv)
 
     auto ent = sys.createEntity();
     sys.addComponent(ent, "Game.Menu");
-    sys.addComponent(ent, "Game.Player");
 
     return eng.mainLoop();
 }

@@ -7,7 +7,7 @@ include_directories(
 )
 
 link_directories(
-	${Boost_LIBRARY_DIRS}
+    ${Boost_LIBRARY_DIRS}
 )
 
 set(Engine_SOURCES
@@ -19,6 +19,9 @@ set(Engine_SOURCES
 
     SpriteSheet.hpp
     SpriteSheet.cpp
+
+    DataFile.hpp
+    DataFile.cpp
 )
 
 set(Game_SOURCES
@@ -28,8 +31,17 @@ set(Game_SOURCES
     Game/Countdown.hpp
     Game/Countdown.cpp
 
+    Game/World.hpp
+    Game/World.cpp
+
     Game/Player.hpp
     Game/Player.cpp
+
+    Game/Weapon.hpp
+    Game/Weapon.cpp
+
+    Game/Enemy.hpp
+    Game/Enemy.cpp
 )
 
 source_group(Engine FILES ${Engine_SOURCES})

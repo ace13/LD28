@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "Resources.hpp"
 #include <Kunlaboro/EntitySystem.hpp>
 #include <Kunlaboro/Component.hpp>
 #include <SFML/Window/Event.hpp>
@@ -59,6 +60,7 @@ int Engine::mainLoop()
         KEY(W) KEY(A) KEY(S) KEY(D)
         KEY(Up) KEY(Down) KEY(Left) KEY(Right)
         KEY(Space) KEY(Return) KEY(Escape)
+        KEY(LShift)
 
         default:
         return "Invalid";
@@ -66,7 +68,7 @@ int Engine::mainLoop()
     };
 #undef KEY
 
-    mWindow.create(sf::VideoMode(1024,768), "Ludum Dare #28");
+    mWindow.create(sf::VideoMode(1024,768), Resources::String_Name);
 
     sf::Event ev;
     sf::Clock timer;
@@ -112,8 +114,20 @@ int Engine::mainLoop()
 
             case sf::Event::MouseMoved:
                 {
-                    msg.payload = sf::Vector2f(ev.mouseMove.x, ev.mouseMove.y);
+                    auto pos = sf::Vector2f(ev.mouseMove.x, ev.mouseMove.y);
+                    msg.payload = pos;
                     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Mouse.Move"), msg);
+                    {
+                        sf::Vector2f vS = mGameView.getSize(), vC = mGameView.getCenter(), wS = (sf::Vector2f)mWindow.getSize();
+                        sf::FloatRect vR;
+                        vR.left = vC.x - vS.x / 2;
+                        vR.top = vC.y - vS.y / 2;
+                        vR.width = vS.x;
+                        vR.height = vS.y;
+
+                        msg.payload = sf::Vector2f(vR.left + vR.width * (pos.x / wS.x), vR.top + vR.height * (pos.y / wS.y));
+                    }
+                    mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Mouse.MoveGame"), msg);
                 } break;
             }
         }
