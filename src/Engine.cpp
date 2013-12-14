@@ -53,7 +53,7 @@ Engine::~Engine()
 
 int Engine::mainLoop()
 {
-#define KEY(key) case sf::Keyboard::##key##: return #key; break;
+#define KEY(key) case sf::Keyboard::key: return #key; break;
     auto keyToString = [](sf::Keyboard::Key k) -> std::string {
         switch(k)
         {
