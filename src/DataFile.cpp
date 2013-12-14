@@ -78,3 +78,10 @@ bool DataFile::loadFromFile(const std::string& filename)
     return true;
 }
 
+std::string DataFile::operator[](const std::string& key) const
+{
+    if (mData.count(key) == 0)
+        return "";
+
+    return mData.at(key);
+}

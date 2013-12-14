@@ -11,6 +11,8 @@ public:
     void addedToEntity();
 
 private:
+    std::string mName;
+
     float mDamage;
     float mSpread;
     float mFireRate;

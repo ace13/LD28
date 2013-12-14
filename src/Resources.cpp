@@ -4,7 +4,7 @@
 std::string Resources::String_Name = "Run 'n Gun";
 sf::Font* Resources::Font_Dosis = nullptr;
 sf::Texture* Resources::Texture_Player = nullptr;
-std::list<DataFile> Resources::File_Data;
+std::vector<DataFile> Resources::File_Data;
 
 void Resources::initialize()
 {
@@ -13,7 +13,12 @@ void Resources::initialize()
     Texture_Player = new sf::Texture();
     if (!Texture_Player->loadFromFile("Player.png")) throw std::runtime_error("Failed to load Player.png");
     
-    DataFile test;
-    test.loadFromFile("test.weapon");
-    File_Data.push_back(test);
+    const std::string DataFiles[] = { "test.weapon" };
+
+    for (int i = 0; i < sizeof(DataFiles) / sizeof(std::string); ++i)
+    {
+        DataFile test;
+        test.loadFromFile(DataFiles[i]);
+        File_Data.push_back(test);
+    }
 }
