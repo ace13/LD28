@@ -1,5 +1,5 @@
 find_package(SFML REQUIRED COMPONENTS system window graphics)
-FIND_PACKAGE(Boost REQUIRED COMPONENTS system thread)
+FIND_PACKAGE(Boost REQUIRED COMPONENTS system filesystem thread)
 
 include_directories(
     ${SFML_INCLUDE_DIR}
@@ -78,4 +78,4 @@ elseif (UNIX)
 endif ()
 
 add_executable(LD28 main.cpp ${Engine_SOURCES} ${Game_SOURCES})
-target_link_libraries(LD28 Kunlaboro ${SFML_LIBRARIES})
+target_link_libraries(LD28 Kunlaboro ${SFML_LIBRARIES} ${Boost_LIBRARIES})

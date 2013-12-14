@@ -41,7 +41,7 @@ void Player::addedToEntity()
         gameView->move((mPosition - curPos) * dt * 2.f);
 
         sf::Vector2f diff((mPressed & M_D)/M_D - (mPressed & M_A)/M_A, (mPressed & M_S)/M_S - (mPressed & M_W)/M_W);
-        float len = std::min(sqrt(diff.x * diff.x + diff.y * diff.y), 1.f);
+        float len = std::min((float)sqrt(diff.x * diff.x + diff.y * diff.y), 1.f);
 
         if (len > 0.5)
         {

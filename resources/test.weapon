@@ -1,0 +1,14 @@
+Name: A basic pistol
+
+Weapon Sprite: Pistol.png
+Magazine Sprite: Pistol-magazine.png
+Bullet Sprite: Pistol-bullet.png
+
+Type: Pistol
+Bullets Per Shot: 1
+
+Rate: 0.5 - 1
+Damage: 5 - 15.0
+Spread: 1 - 7.0
+Bullets: 8 - 16
+Mags: 0 - 5
