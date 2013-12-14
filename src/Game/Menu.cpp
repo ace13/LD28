@@ -44,6 +44,9 @@ void Menu::addedToEntity()
                 auto& sys = *getEntitySystem();
         
                 auto ent = sys.createEntity();
+                sys.addComponent(ent, "Game.World");
+
+                ent = sys.createEntity();
                 sys.addComponent(ent, "Game.Player");
                 sys.addComponent(ent, "Game.Weapon");
 

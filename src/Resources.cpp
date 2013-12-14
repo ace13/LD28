@@ -6,6 +6,7 @@ std::string Resources::String_Name = "Run 'n Gun";
 sf::Font Resources::Font_Dosis;
 sf::Texture Resources::Texture_Player;
 sf::Texture Resources::Texture_Enemy;
+sf::Texture Resources::Texture_Ground;
 
 std::vector<DataFile> Resources::Data_Weapons;
 std::unordered_map<std::string, sf::Texture> Resources::Texture_Weapons;
@@ -15,6 +16,7 @@ void Resources::initialize()
     if (!Font_Dosis.loadFromFile("Dosis-Book.ttf")) throw std::runtime_error("Failed to load Dosis-Book.ttf");
     if (!Texture_Player.loadFromFile("Player.png")) throw std::runtime_error("Failed to load Player.png");
     if (!Texture_Enemy.loadFromFile("Enemy.png")) throw std::runtime_error("Failed to load Enemy.png");
+    if (!Texture_Ground.loadFromFile("Ground.png")) throw std::runtime_error("Failed to load Ground.png");
 
     for (auto it = boost::filesystem::directory_iterator("."); it != boost::filesystem::directory_iterator(); ++it)
     {

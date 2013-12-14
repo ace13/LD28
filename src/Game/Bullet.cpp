@@ -82,6 +82,22 @@ void Bullet::addedToEntity()
         if (flip)
             bullet.setScale(-1, -1);
 
+        const int trailLength = 6;
+        auto size = mTexture->getSize();
+        float sizeLen = (float)sqrt((float)size.x*size.x + size.y*size.y) / 2.f;
+
+        sf::Vector2f dir = sf::Vector2f(cos(mAngle), sin(mAngle));
+        bullet.move(dir * (float)-trailLength * sizeLen);
+
+        for (int i = 0; i < trailLength; ++i)
+        {
+            float str = 255 * i/6;
+            bullet.setColor(sf::Color(str, str, str, str));
+            target.draw(bullet);
+
+            bullet.move(dir * sizeLen);
+        }
+
         target.draw(bullet);
     });
 }

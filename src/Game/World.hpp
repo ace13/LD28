@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../SpriteSheet.hpp"
 #include <Kunlaboro/Component.hpp>
 
 class World : public Kunlaboro::Component
@@ -11,6 +12,6 @@ public:
     void addedToEntity();
 
 private:
-
+    SpriteSheet mSheet;
 
 };

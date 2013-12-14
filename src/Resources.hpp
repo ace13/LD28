@@ -13,6 +13,7 @@ static std::string String_Name;
 static sf::Font Font_Dosis;
 static sf::Texture Texture_Player;
 static sf::Texture Texture_Enemy;
+static sf::Texture Texture_Ground;
 
 static std::vector<DataFile> Data_Weapons;
 static std::unordered_map<std::string, sf::Texture> Texture_Weapons;
