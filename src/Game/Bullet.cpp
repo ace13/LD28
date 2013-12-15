@@ -49,6 +49,8 @@ void Bullet::addedToEntity()
         mAngle += rs(dev) * (M_PI / 180);
     }
 
+    sendGlobalMessage("I am bullet!");
+
     requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
     {
         float dt = boost::any_cast<float>(msg.payload);
@@ -62,6 +64,7 @@ void Bullet::addedToEntity()
         auto reply = sendGlobalQuestion("Did I hit something?", mPosition);
         if (reply.handled)
         {
+            sendGlobalMessage("I am bullethole!");
             getEntitySystem()->destroyComponent(this);
         }
     });

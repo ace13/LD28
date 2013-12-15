@@ -81,13 +81,13 @@ void Weapon::addedToEntity()
 
         auto& sys = *getEntitySystem();
 
-        sys.removeComponent(getOwnerId(), this);
-
         auto ent = sys.createEntity();
         auto pickup = dynamic_cast<Pickup*>(sys.createComponent("Game.Pickup"));
         pickup->setPosition(boost::any_cast<sf::Vector2f>(reply.payload));
 
         sys.addComponent(ent, pickup);
+        
+        sys.removeComponent(getOwnerId(), this);
         sys.addComponent(ent, this);        
 
         msg.handled = true;

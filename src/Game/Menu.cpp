@@ -73,7 +73,8 @@ void Menu::addedToEntity()
             }));
         }
         
-        mEntries.push_back(std::make_pair("Scoreboard", [this]() { }));
+        ///\TODO High scores
+        //mEntries.push_back(std::make_pair("Scoreboard", [this]() { }));
         mEntries.push_back(std::make_pair("End Game", [this]() { sendGlobalMessage("ExitGame"); }));
     }
 

@@ -111,7 +111,7 @@ void Enemy::addedToEntity()
         auto data = boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload);
         auto& target = *std::get<0>(data);
 
-        sf::FloatRect viewRect(target.getView().getCenter(), target.getView().getSize());
+        sf::FloatRect viewRect(target.getView().getCenter()+sf::Vector2f(32,32), target.getView().getSize()+sf::Vector2f(64,64));
         viewRect.left -= viewRect.width / 2.f;
         viewRect.top -= viewRect.height / 2.f;
 
@@ -119,7 +119,7 @@ void Enemy::addedToEntity()
         {
             mFadeTime += std::get<1>(data);
 
-            if (mFadeTime > 4)
+            if (mFadeTime > 10)
                 getEntitySystem()->destroyEntity(getOwnerId());
         }
         else
@@ -166,7 +166,7 @@ void Enemy::addedToEntity()
             if (mHealth <= 0 && lastHealth > 0)
             {
                 bool playerKill = !getEntitySystem()->getAllComponentsOnEntity(msg.sender->getOwnerId(), "Game.Player").empty();
-                sendGlobalMessage("Enemy dead!", playerKill);
+                sendGlobalMessage("Is dead now", playerKill);
             }
 
             msg.payload = true;

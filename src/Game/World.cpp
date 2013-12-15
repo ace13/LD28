@@ -114,4 +114,11 @@ void World::addedToEntity()
     changeRequestPriority("Event.Draw", -9001);
 
     requestMessage("I'm ending this!", [this](const Kunlaboro::Message& msg) { getEntitySystem()->destroyEntity(getOwnerId()); });
+    requestMessage("Did I accidentally all the stats?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mStats; }); ///< No, no you didn't.
+
+    requestMessage("I am bullet!", [this](const Kunlaboro::Message&) { mStats.ShotsFired++; });
+    requestMessage("I am bullethole!", [this](const Kunlaboro::Message&) { mStats.ShotsHit++; });
+    requestMessage("Is dead now", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) mStats.EnemiesDeadByPlayer++; else mStats.EnemiesDead++; });
+    requestMessage("Demon Speeding", [this](const Kunlaboro::Message& msg) { float s = boost::any_cast<float>(msg.payload); mStats.MaxSpeed = std::max(mStats.MaxSpeed, s); });
+    requestMessage("Road to Rouen", [this](const Kunlaboro::Message& msg) { float s = boost::any_cast<float>(msg.payload); mStats.DistanceTraveled += s; });
 }

@@ -27,8 +27,12 @@ set(Engine_SOURCES
 )
 
 set(Game_SOURCES
+    Game/Intro.hpp
+    Game/Intro.cpp
     Game/Menu.hpp
     Game/Menu.cpp
+    Game/EndScreen.hpp
+    Game/EndScreen.cpp
 
     Game/World.hpp
     Game/World.cpp

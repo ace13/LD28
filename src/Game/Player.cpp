@@ -59,12 +59,21 @@ void Player::addedToEntity()
             if (mWeapon && mWeapon->weaponType() == "Bonus")
                 boost = mWeapon->getRate();
 
+            sendGlobalMessage("Demon Speeding", len * (gMoveSpeed / 64.f) * (1.f + (mPressed & M_Shift)/M_Shift) * boost);
+            sendGlobalMessage("Road to Rouen", dt * len * (gMoveSpeed / 64.f) * (1.f + (mPressed & M_Shift)/M_Shift) * boost);
             mPosition += diff * dt * gMoveSpeed * (1.f + (mPressed & M_Shift)/M_Shift) * boost;
         }
         else
             mLastWalkAng = -1000;
 
         mTime += dt * 2;
+
+        if (mHealth < 0)
+        {
+            auto& sys = *getEntitySystem();
+            auto ent = sys.createEntity();
+            sys.addComponent(ent, "Game.EndScreen");
+        }
     });
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
@@ -111,6 +120,7 @@ void Player::addedToEntity()
             sf::ConvexShape shape(4);
             sf::Text weapName(mWeapon->weaponName(), Resources::Font_Dosis);
             sf::Sprite weap(mWeapon->weaponTexture());
+            sf::RectangleShape bar;
 
             float width = weapName.getLocalBounds().width + mWeapon->weaponTexture().getSize().x + 32;
             width = std::max(width, mWeapon->weaponTexture().getSize().x + 10.f + mWeapon->magazinesLeft() * (mWeapon->magazineTexture().getSize().x + 4) + mWeapon->bulletsLeft() * (mWeapon->bulletTexture().getSize().x + 2) + 32.f);
