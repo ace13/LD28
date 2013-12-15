@@ -9,7 +9,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <Kunlaboro/EntitySystem.hpp>
 
-Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mHealth(100), mArmor(1), mTime(0), mLastAng(0), mDrawAng(0), mFear(false)
+Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mHealth(100), mArmor(1), mTime(0), mLastAng(0), mDrawAng(0), mFadeTime(0), mFear(false)
 {
 }
 
@@ -29,7 +29,7 @@ void Enemy::addedToEntity()
         std::random_device dev;
         float randAng = std::uniform_real_distribution<float>(0, M_PI * 2)(dev);
 
-        mPosition = sf::Vector2f(cos(randAng), sin(randAng)) * 1024.f;
+        mPosition = playerPos + sf::Vector2f(cos(randAng), sin(randAng)) * 1024.f;
     }
 
     requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
@@ -63,6 +63,12 @@ void Enemy::addedToEntity()
             auto reply = sendQuestion("Such bullets?");
             if (!reply.handled)
                 return;
+
+            if (dynamic_cast<Weapon*>(reply.sender)->weaponType() == "Bonus")
+            {
+                sendMessage("Throw it to the ground!");
+                return;
+            }
 
             int ammo = boost::any_cast<int>(reply.payload);
 
@@ -101,15 +107,32 @@ void Enemy::addedToEntity()
     });
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
-        auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
+        auto data = boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload);
+        auto& target = *std::get<0>(data);
 
-        sf::Sprite enemy(Resources::Texture_Enemy);
-        enemy.setTextureRect(mSheet.getRect(0,0));
-        enemy.setOrigin(enemy.getTextureRect().width / 2, enemy.getTextureRect().height / 2);
-        enemy.setPosition(mPosition);
-        enemy.setRotation(mDrawAng * (180 / M_PI));
+        sf::FloatRect viewRect(target.getView().getCenter(), target.getView().getSize());
+        viewRect.left -= viewRect.width / 2.f;
+        viewRect.top -= viewRect.height / 2.f;
 
-        target.draw(enemy);
+        if (!viewRect.contains(mPosition))
+        {
+            mFadeTime += std::get<1>(data);
+
+            if (mFadeTime > 4)
+                getEntitySystem()->destroyEntity(getOwnerId());
+        }
+        else
+        {
+            mFadeTime = 0;
+
+            sf::Sprite enemy(Resources::Texture_Enemy);
+            enemy.setTextureRect(mSheet.getRect(0,0));
+            enemy.setOrigin(enemy.getTextureRect().width / 2, enemy.getTextureRect().height / 2);
+            enemy.setPosition(mPosition);
+            enemy.setRotation(mDrawAng * (180 / M_PI));
+
+            target.draw(enemy);
+        }
     });
 
     requestMessage("I'm ending this!", [this](const Kunlaboro::Message& msg) { getEntitySystem()->destroyEntity(getOwnerId()); });
@@ -151,9 +174,11 @@ void Enemy::addedToEntity()
         {
             auto& sys = *getEntitySystem();
 
-            auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-            dialog->setMessage("Eat " + weap->bulletName() + " and die!");
-            addLocalComponent(dialog);
+            {
+                auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
+                dialog->setMessage("Eat " + weap->bulletName() + " and die!");
+                addLocalComponent(dialog);
+            }
         }
         else
         {

@@ -24,6 +24,7 @@ void Weapon::addedToEntity()
         DataFile& file = Resources::Data_Weapons[std::uniform_int_distribution<int>(0, Resources::Data_Weapons.size() - 1)(dev)];
 
         mName = file["Name"];
+        mType = file["Type"];
         mBulletName = file["Bullet Name"];
         mDamage = atof(file["Damage"].c_str());
         mSpread = atof(file["Spread"].c_str());
@@ -46,6 +47,8 @@ void Weapon::addedToEntity()
         if (mBulletsInCurrentMag > 0)
         {
             --mBulletsInCurrentMag;
+
+            if (mType == "Bonus") return;
 
             for (int i = 0; i < mBulletsPerShot; ++i)
             {

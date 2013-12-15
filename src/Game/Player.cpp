@@ -1,6 +1,7 @@
 #include "Player.hpp"
 #include "Weapon.hpp"
 #include "Dialog.hpp"
+#include "Bullet.hpp"
 #include "../Math.hpp"
 #include "../Resources.hpp"
 
@@ -18,7 +19,7 @@ enum Move
     M_Shift = 16
 };
 
-Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(Resources::Texture_Player, 4, 2), mTime(0), mPressed(0), mWeapon(nullptr), mLastWalkAng(-1000)
+Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(Resources::Texture_Player, 4, 2), mTime(0), mPressed(0), mWeapon(nullptr), mLastWalkAng(-1000), mHealth(100)
 {
 }
 
@@ -40,6 +41,8 @@ void Player::addedToEntity()
     {
         float dt = boost::any_cast<float>(msg.payload);
 
+        mHealth = std::min(100.f, mHealth + dt);
+
         auto curPos = gameView->getCenter();
         gameView->move((mPosition - curPos) * dt * 2.f);
 
@@ -52,7 +55,11 @@ void Player::addedToEntity()
             mLastWalkAng = ang * (180 / M_PI);
             diff = sf::Vector2f(cos(ang), sin(ang)) * len;
 
-            mPosition += diff * dt * gMoveSpeed * (1.f + (mPressed & M_Shift)/M_Shift);
+            float boost = 1;
+            if (mWeapon && mWeapon->weaponType() == "Bonus")
+                boost = mWeapon->getRate();
+
+            mPosition += diff * dt * gMoveSpeed * (1.f + (mPressed & M_Shift)/M_Shift) * boost;
         }
         else
             mLastWalkAng = -1000;
@@ -99,6 +106,12 @@ void Player::addedToEntity()
 
         if (mWeapon)
         {
+            auto size = target.getView().getSize();
+            size.y = 96;
+            sf::RectangleShape shape(size);
+            shape.setFillColor(sf::Color(0,0,0, 96));
+            target.draw(shape);
+
             sf::Sprite weap(mWeapon->weaponTexture());
             weap.move(5, 5);
             target.draw(weap);
@@ -210,10 +223,28 @@ void Player::addedToEntity()
 
         if (diff < 32)
         {
-            auto dialog = dynamic_cast<Dialog*>(getEntitySystem()->createComponent("Game.Dialog"));
-            dialog->setMessage("OW");
-            addLocalComponent(dialog);
+            auto bullet = dynamic_cast<Bullet*>(msg.sender);
+            float damage = bullet->getDamage();
 
+            if (mWeapon && mWeapon->weaponType() == "Bonus" && mWeapon->magazinesLeft() > 0)
+            {
+                damage *= mWeapon->getDamage();
+                mWeapon->throwMagazine();
+            }
+
+            {
+                auto dialog = dynamic_cast<Dialog*>(getEntitySystem()->createComponent("Game.Dialog"));
+                if (damage < 0.1)
+                    dialog->setMessage("Didn't hurt");
+                else
+                {
+                    dialog->setMessage("OW");
+
+                    mHealth -= damage;
+                }
+                addLocalComponent(dialog);
+            }
+            
             msg.payload = true;
             msg.handled = true;
         }

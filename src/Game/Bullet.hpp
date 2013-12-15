@@ -14,6 +14,7 @@ public:
     void addedToEntity();
 
     inline float getDamage() const { return mDamage; }
+    inline void setDamage(float damage) { mDamage = damage; }
 
 private:
     sf::Vector2f mPosition;

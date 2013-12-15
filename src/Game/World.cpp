@@ -75,7 +75,7 @@ void World::addedToEntity()
 
             sendGlobalMessage("Would the real slim shady please stand up?", &list);
 
-            if (list.size() < 5)
+            if (list.size() < 15)
             {
                 auto& sys = *getEntitySystem();
                 auto ent = sys.createEntity();
