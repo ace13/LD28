@@ -1,5 +1,6 @@
 #include "Player.hpp"
 #include "Weapon.hpp"
+#include "Dialog.hpp"
 #include "../Math.hpp"
 #include "../Resources.hpp"
 
@@ -187,6 +188,10 @@ void Player::addedToEntity()
 
         if (diff < 32)
         {
+            auto dialog = dynamic_cast<Dialog*>(getEntitySystem()->createComponent("Game.Dialog"));
+            dialog->setMessage("OW");
+            addLocalComponent(dialog);
+
             msg.payload = true;
             msg.handled = true;
         }

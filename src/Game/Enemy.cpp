@@ -59,7 +59,7 @@ void Enemy::addedToEntity()
                 }
             }
 
-            mLastFire = std::uniform_real_distribution<float>(0, 360)(dev);
+            mLastFire = (atan2(playerPos.y - mPosition.y, playerPos.x - mPosition.x) + std::uniform_real_distribution<float>(-0.2, 0.2)(dev)) * (180/M_PI);
 
             sendMessage("Fire ze missiles!");
         }
