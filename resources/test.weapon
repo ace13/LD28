@@ -5,7 +5,7 @@ Weapon Sprite: Pistol.png
 Magazine Sprite: Pistol-magazine.png
 Bullet Sprite: Pistol-bullet.png
 
-Type: Pistol
+Type: Semi-auto
 Bullets Per Shot: 1
 Reload Time: 4.0 - 5
 

@@ -5,7 +5,7 @@ Weapon Sprite: Cup.png
 Bullet Sprite: Cup.png
 Magazine Sprite: Cup.png
 
-Type: Pistol
+Type: Semi-auto
 Bullets Per Shot: 0
 Reload Time: 0
 

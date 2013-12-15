@@ -5,7 +5,7 @@ Weapon Sprite: Bananabunch.png
 Bullet Sprite: Banana-bullet.png
 Magazine Sprite: Banana.png
 
-Type: Pistol
+Type: Semi-auto
 Bullets Per Shot: 1
 Reload Time: 2.0 - 3
 

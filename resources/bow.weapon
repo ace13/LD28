@@ -1,0 +1,16 @@
+Name: Bow and arrows
+Bullet Name: arrows
+
+Weapon Sprite: Bow.png
+Bullet Sprite: Arrow.png
+Magazine Sprite: Quiver.png
+
+Type: Charge
+Bullets Per Shot: 1 - 3
+Reload Time: 5
+
+Rate: 2.0 - 4
+Damage: 5 - 10.0
+Spread: 0 - 10.0
+Bullets: 1 - 8
+Mags: 1 - 3

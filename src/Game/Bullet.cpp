@@ -86,7 +86,7 @@ void Bullet::addedToEntity()
         bool flip = (int)(mLifeTime * 6) % 2;
 
         if (flip)
-            bullet.setScale(-1, -1);
+            bullet.setScale(-1, 1);
 
         const int trailLength = 6;
         auto size = mTexture->getSize();
