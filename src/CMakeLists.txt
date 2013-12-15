@@ -30,9 +30,6 @@ set(Game_SOURCES
     Game/Menu.hpp
     Game/Menu.cpp
 
-    Game/Countdown.hpp
-    Game/Countdown.cpp
-
     Game/World.hpp
     Game/World.cpp
 
