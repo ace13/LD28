@@ -13,6 +13,8 @@ public:
 
     void addedToEntity();
 
+    inline float getDamage() const { return mDamage; }
+
 private:
     sf::Vector2f mPosition;
     sf::Texture* mTexture;

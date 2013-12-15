@@ -18,7 +18,7 @@ enum Move
     M_Shift = 16
 };
 
-Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(Resources::Texture_Player, 4, 2), mTime(0), mPressed(0), mWeapon(nullptr)
+Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(Resources::Texture_Player, 4, 2), mTime(0), mPressed(0), mWeapon(nullptr), mLastWalkAng(-1000)
 {
 }
 
@@ -34,6 +34,7 @@ void Player::addedToEntity()
         gameView = boost::any_cast<sf::View*>(response.payload);
 
     requestMessage("Is the game running?", [](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = true; });
+    requestMessage("I'm ending this!", [this](const Kunlaboro::Message& msg) { getEntitySystem()->destroyEntity(getOwnerId()); });
 
     requestMessage("Event.Update", [this, gameView](const Kunlaboro::Message& msg)
     {
@@ -48,10 +49,13 @@ void Player::addedToEntity()
         if (len > 0.5)
         {
             float ang = atan2(diff.y, diff.x);
+            mLastWalkAng = ang * (180 / M_PI);
             diff = sf::Vector2f(cos(ang), sin(ang)) * len;
 
             mPosition += diff * dt * gMoveSpeed * (1.f + (mPressed & M_Shift)/M_Shift);
         }
+        else
+            mLastWalkAng = -1000;
 
         mTime += dt * 2;
     });
@@ -60,15 +64,33 @@ void Player::addedToEntity()
         auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
 
         sf::Sprite sprite(Resources::Texture_Player);
-        sprite.setTextureRect(mSheet.getRect((int)mTime % 4, (mPressed & M_Shift) / M_Shift));
+        sprite.setTextureRect(mSheet.getRect(0,0));
         sprite.setOrigin(sprite.getTextureRect().width / 2, sprite.getTextureRect().height / 2);
         sprite.setPosition(mPosition);
-        sprite.setRotation(mAngle); 
-        target.draw(sprite);
 
-        // This is an animation, dig it?
-        if (mTime > 4)
-            mTime -= 4;
+        if (mLastWalkAng > -1000)
+        {
+            bool sprint = (mPressed & M_Shift);
+            
+            sprite.setRotation(mLastWalkAng + 90); 
+            if (sprint)
+            {
+                int val = (int)(mTime * 4) % 4;
+                sprite.setTextureRect(mSheet.getRect((val < 2 ? (val % 2) * 2 : 1 + (val % 2) * 2), 1));
+                target.draw(sprite);
+            }
+            else
+            {
+                int val = (int)(mTime) % 4;
+                sprite.setTextureRect(mSheet.getRect(val/2, 1));
+                if (val % 2)
+                    target.draw(sprite);
+            }
+        }
+
+        sprite.setTextureRect(mSheet.getRect((int)mTime % 4, 0));
+        sprite.setRotation(mAngle + 90);
+        target.draw(sprite);
     });
 
     requestMessage("Event.DrawUi", [this](const Kunlaboro::Message& msg)

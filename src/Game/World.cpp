@@ -1,6 +1,8 @@
 #include "World.hpp"
+#include "Enemy.hpp"
 #include "../Resources.hpp"
 #include <SFML/Graphics/Sprite.hpp>
+#include <Kunlaboro/EntitySystem.hpp>
 #include <random>
 #include <tuple>
 
@@ -59,6 +61,30 @@ void World::addedToEntity()
         mBigOne = render.getTexture();
     }
 
+    requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
+    {
+        static float timer = 0;
+        float dt = boost::any_cast<float>(msg.payload);
+
+        timer += dt;
+
+        if (timer > 1)
+        {
+            timer = 0;
+            std::list<Enemy*> list;
+
+            sendGlobalMessage("Would the real slim shady please stand up?", &list);
+
+            if (list.size() < 5)
+            {
+                auto& sys = *getEntitySystem();
+                auto ent = sys.createEntity();
+                sys.addComponent(ent, "Game.Enemy");
+                sys.addComponent(ent, "Game.Weapon");
+            }
+        }
+    });
+
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
         auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
@@ -86,4 +112,6 @@ void World::addedToEntity()
 
     });
     changeRequestPriority("Event.Draw", -9001);
+
+    requestMessage("I'm ending this!", [this](const Kunlaboro::Message& msg) { getEntitySystem()->destroyEntity(getOwnerId()); });
 }

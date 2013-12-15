@@ -20,7 +20,7 @@ public:
 private:
     Weapon* mWeapon;
     char mPressed;
-    float mTime, mAngle;
+    float mTime, mAngle, mLastWalkAng;
     sf::Vector2f mPosition, mMouse;
     SpriteSheet mSheet;
 };

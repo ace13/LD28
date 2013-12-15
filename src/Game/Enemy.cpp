@@ -1,6 +1,7 @@
 #include "Enemy.hpp"
 #include "Weapon.hpp"
 #include "Dialog.hpp"
+#include "Bullet.hpp"
 #include "../Resources.hpp"
 #include "../Math.hpp"
 #include <tuple>
@@ -8,7 +9,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <Kunlaboro/EntitySystem.hpp>
 
-Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mPosition(256, 256), mHealth(100), mArmor(1), mTime(0), mLastAng(0)
+Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mHealth(100), mArmor(1), mTime(0), mLastAng(0), mDrawAng(0), mFear(false)
 {
 }
 
@@ -18,6 +19,19 @@ Enemy::~Enemy()
 
 void Enemy::addedToEntity()
 {
+    if (mPosition == sf::Vector2f())
+    {
+        sf::Vector2f playerPos;
+        auto reply = sendGlobalQuestion("Where's the player?");
+        if (reply.handled)
+            playerPos = boost::any_cast<sf::Vector2f>(reply.payload);
+
+        std::random_device dev;
+        float randAng = std::uniform_real_distribution<float>(0, M_PI * 2)(dev);
+
+        mPosition = sf::Vector2f(cos(randAng), sin(randAng)) * 1024.f;
+    }
+
     requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
     {
         float dt = boost::any_cast<float>(msg.payload);
@@ -28,10 +42,17 @@ void Enemy::addedToEntity()
         if (reply.handled)
             playerPos = boost::any_cast<sf::Vector2f>(reply.payload);
 
+        float playerAng = atan2(playerPos.y - mPosition.y, playerPos.x - mPosition.x);
         float randAng = std::uniform_real_distribution<float>(-0.1, 0.1)(dev);
         
         mLastAng += randAng;
+        if (mFear)
+            mLastAng += (playerAng+M_PI - mLastAng) * dt;
+        else
+            mLastAng += (playerAng - mLastAng) * dt;
+        
         mPosition += sf::Vector2f(cos(mLastAng), sin(mLastAng)) * dt * 100.f;
+        mDrawAng += (mLastAng - mDrawAng) / 8.f;
 
         mTime += dt;
 
@@ -59,9 +80,17 @@ void Enemy::addedToEntity()
                 }
             }
 
-            mLastFire = (atan2(playerPos.y - mPosition.y, playerPos.x - mPosition.x) + std::uniform_real_distribution<float>(-0.2, 0.2)(dev)) * (180/M_PI);
+            mLastFire = (playerAng + std::uniform_real_distribution<float>(-0.2, 0.2)(dev)) * (180/M_PI);
 
             sendMessage("Fire ze missiles!");
+        }
+
+        if (mHealth <= 25 && !mFear)
+        {
+            auto dialog = dynamic_cast<Dialog*>(getEntitySystem()->createComponent("Game.Dialog"));
+            dialog->setMessage("The pain!");
+            addLocalComponent(dialog);
+            mFear = true;
         }
 
         if (mHealth <= 0)
@@ -78,13 +107,19 @@ void Enemy::addedToEntity()
         enemy.setTextureRect(mSheet.getRect(0,0));
         enemy.setOrigin(enemy.getTextureRect().width / 2, enemy.getTextureRect().height / 2);
         enemy.setPosition(mPosition);
-        enemy.setRotation(mLastAng * (180 / M_PI));
+        enemy.setRotation(mDrawAng * (180 / M_PI));
 
         target.draw(enemy);
     });
 
+    requestMessage("I'm ending this!", [this](const Kunlaboro::Message& msg) { getEntitySystem()->destroyEntity(getOwnerId()); });
     requestMessage("Where am I?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mPosition; }, true);
     requestMessage("Where am I shooting?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = std::make_tuple(mPosition, mLastFire); });
+    requestMessage("Would the real slim shady please stand up?", [this](const Kunlaboro::Message& msg)
+    {
+        auto data = boost::any_cast<std::list<Enemy*>*>(msg.payload);
+        data->push_back(this);
+    });
     requestMessage("Did I hit something?", [this](Kunlaboro::Message& msg)
     {
         if (msg.sender->getOwnerId() == getOwnerId()) return; 
@@ -100,8 +135,8 @@ void Enemy::addedToEntity()
             dialog->setMessage("OW");
             addLocalComponent(dialog);
 
-            ///\TODO Better damages
-            mHealth -= 50;
+            auto bullet = dynamic_cast<Bullet*>(msg.sender);
+            mHealth -= bullet->getDamage();
 
             msg.payload = true;
             msg.handled = true;
@@ -127,6 +162,8 @@ void Enemy::addedToEntity()
             auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
             dialog->setMessage("No more " + weap->bulletName()+ "?\nI AM FLEEING IN FEAR!");
             addLocalComponent(dialog);
+
+            mFear = true;
         }
     });
 }

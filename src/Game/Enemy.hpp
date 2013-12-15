@@ -16,6 +16,7 @@ public:
 
 private:
     SpriteSheet mSheet;
-    float mHealth, mArmor, mTime, mLastFire, mLastAng;
+    bool mFear;
+    float mHealth, mArmor, mTime, mLastFire, mLastAng, mDrawAng;
     sf::Vector2f mPosition;
 };

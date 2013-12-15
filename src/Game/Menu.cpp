@@ -24,6 +24,22 @@ Menu::~Menu()
 
 void Menu::addedToEntity()
 {
+    auto startGame = [](Kunlaboro::EntitySystem& sys, Kunlaboro::EntityId eid)
+    {
+        auto ent = sys.createEntity();
+        sys.addComponent(ent, "Game.World");
+
+        ent = sys.createEntity();
+        sys.addComponent(ent, "Game.Player");
+        sys.addComponent(ent, "Game.Weapon");
+
+        ent = sys.createEntity();
+        sys.addComponent(ent, "Game.Enemy");
+        sys.addComponent(ent, "Game.Weapon");
+
+        sys.destroyEntity(eid);
+    };
+
     if (mEntries.empty())
     {
         auto& sys = *getEntitySystem();
@@ -38,29 +54,21 @@ void Menu::addedToEntity()
             {
                 sys.destroyEntity(getOwnerId());
             }));
-            mEntries.push_back(std::make_pair("End Game", [this]() { sendGlobalMessage("ExitGame"); }));
+            mEntries.push_back(std::make_pair("Restart Game", [this, &sys, &startGame]()
+            {
+                sendGlobalMessage("I'm ending this!");
+
+                startGame(sys, getOwnerId());
+            }));
+            mEntries.push_back(std::make_pair("Quit Game", [this]() { sendGlobalMessage("ExitGame"); }));
         }
         else
         {
             mInGame = false;
-
             mEntries.push_back(std::make_pair("How do I even play this game?", [this]() { }));
-            mEntries.push_back(std::make_pair("Start Game", [this]()
+            mEntries.push_back(std::make_pair("Start Game", [this, &sys, &startGame]()
             {
-                auto& sys = *getEntitySystem();
-        
-                auto ent = sys.createEntity();
-                sys.addComponent(ent, "Game.World");
-
-                ent = sys.createEntity();
-                sys.addComponent(ent, "Game.Player");
-                sys.addComponent(ent, "Game.Weapon");
-
-                ent = sys.createEntity();
-                sys.addComponent(ent, "Game.Enemy");
-                sys.addComponent(ent, "Game.Weapon");
-
-                sys.destroyEntity(getOwnerId());
+                startGame(sys, getOwnerId());
             }));
             mEntries.push_back(std::make_pair("End Game", [this]() { sendGlobalMessage("ExitGame"); }));
         }

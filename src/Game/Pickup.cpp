@@ -92,4 +92,6 @@ void Pickup::addedToEntity()
             msg.handled = true;
         }
     });
+
+    requestMessage("I'm ending this!", [this](const Kunlaboro::Message& msg) { getEntitySystem()->destroyEntity(getOwnerId()); });
 }
