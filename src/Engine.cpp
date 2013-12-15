@@ -13,8 +13,8 @@ public:
 
     void addedToEntity()
     {
-        requestMessage("Event.Engine.Init", &EngineHandler::resized);
-        requestMessage("Event.Window.Resized", &EngineHandler::resized);
+        requestMessage("Event.Engine.Init", [this](const Kunlaboro::Message& msg) { resized(msg); });
+        requestMessage("Event.Window.Resized", [this](const Kunlaboro::Message& msg) { resized(msg); });
         changeRequestPriority("Event.Window.Resized", -42);
         requestMessage("ExitGame", [this](const Kunlaboro::Message& msg) { mWin.close(); });
 
