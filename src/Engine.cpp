@@ -174,10 +174,10 @@ int Engine::mainLoop()
         if (frameTime > 1)
         {
             frameTime -= 1;
+
             fps = frames;
             ups = updates;
-            frames = 0;
-            updates = 0;
+            frames = updates = 0;
         }
 
         {

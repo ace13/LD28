@@ -14,9 +14,13 @@ std::unordered_map<std::string, sf::Texture> Resources::Texture_Weapons;
 void Resources::initialize()
 {
     if (!Font_Dosis.loadFromFile("Dosis-Book.ttf")) throw std::runtime_error("Failed to load Dosis-Book.ttf");
+
     if (!Texture_Player.loadFromFile("Player.png")) throw std::runtime_error("Failed to load Player.png");
+    Texture_Player.setSmooth(true);
     if (!Texture_Enemy.loadFromFile("Enemy.png")) throw std::runtime_error("Failed to load Enemy.png");
+    Texture_Enemy.setSmooth(true);
     if (!Texture_Ground.loadFromFile("Ground.png")) throw std::runtime_error("Failed to load Ground.png");
+    Texture_Ground.setSmooth(true);
 
     for (auto it = boost::filesystem::directory_iterator("."); it != boost::filesystem::directory_iterator(); ++it)
     {

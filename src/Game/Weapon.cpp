@@ -58,6 +58,11 @@ void Weapon::addedToEntity()
     {
         if (mMags > 0)
         {
+            if (mBulletsInCurrentMag > 0)
+            {
+                printf("TODO: particles for lost ammo!\n");
+            }
+
             mBulletsInCurrentMag = mBulletsPerMag;
             --mMags;
         }   

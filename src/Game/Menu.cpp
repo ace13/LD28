@@ -24,7 +24,7 @@ Menu::~Menu()
 
 void Menu::addedToEntity()
 {
-    ///\TODO Put initialization somewhere else?
+    if (mEntries.empty())
     {
         auto& sys = *getEntitySystem();
         Kunlaboro::Message question(Kunlaboro::Type_Message, this);

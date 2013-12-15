@@ -5,7 +5,7 @@
 const float gDistance = 96;
 const float gHorizDistance = 128;
 
-Dialog::Dialog(): Kunlaboro::Component("Game.Dialog"), mTime(0)
+Dialog::Dialog(): Kunlaboro::Component("Game.Dialog"), mTime(0), mPosition(-10000, 10000)
 {
 }
 
