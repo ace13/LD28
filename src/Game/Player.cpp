@@ -108,15 +108,25 @@ void Player::addedToEntity()
         {
             auto size = target.getView().getSize();
             size.y = 96;
-            sf::RectangleShape shape(size);
+            sf::ConvexShape shape(4);
+            sf::Text weapName(mWeapon->weaponName(), Resources::Font_Dosis);
+            sf::Sprite weap(mWeapon->weaponTexture());
+
+            float width = weapName.getLocalBounds().width + mWeapon->weaponTexture().getSize().x + 32;
+            width = std::max(width, mWeapon->weaponTexture().getSize().x + 10.f + mWeapon->magazinesLeft() * (mWeapon->magazineTexture().getSize().x + 4) + mWeapon->bulletsLeft() * (mWeapon->bulletTexture().getSize().x + 2) + 32.f);
+
             shape.setFillColor(sf::Color(0,0,0, 96));
+
+            shape.setPoint(0, sf::Vector2f());
+            shape.setPoint(1, sf::Vector2f(width, 0));
+            shape.setPoint(2, sf::Vector2f(width - 32, 96));
+            shape.setPoint(3, sf::Vector2f(0, 96));
+
             target.draw(shape);
 
-            sf::Sprite weap(mWeapon->weaponTexture());
             weap.move(5, 5);
             target.draw(weap);
-
-            sf::Text weapName(mWeapon->weaponName(), Resources::Font_Dosis);
+            
             weapName.move(weap.getTexture()->getSize().x + 10, 5);
             target.draw(weapName);
 

@@ -102,6 +102,7 @@ void Enemy::addedToEntity()
         if (mHealth <= 0)
         {
             sendMessage("Throw it to the ground!");
+
             getEntitySystem()->destroyEntity(getOwnerId());
         }
     });
@@ -145,7 +146,7 @@ void Enemy::addedToEntity()
     });
     requestMessage("Did I hit something?", [this](Kunlaboro::Message& msg)
     {
-        if (msg.sender->getOwnerId() == getOwnerId()) return; 
+        if (msg.sender->getOwnerId() == getOwnerId()) return;
         
         auto pos = boost::any_cast<sf::Vector2f>(msg.payload);
         float diff = Math::distance(mPosition, pos);
@@ -160,6 +161,11 @@ void Enemy::addedToEntity()
 
             auto bullet = dynamic_cast<Bullet*>(msg.sender);
             mHealth -= bullet->getDamage();
+
+            if (mHealth < 0)
+            {
+                sendGlobalMessage("Enemy dead!");
+            }
 
             msg.payload = true;
             msg.handled = true;

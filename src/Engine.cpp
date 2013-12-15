@@ -68,6 +68,18 @@ int Engine::mainLoop()
     };
 #undef KEY
 
+#define AXIS(axis) case sf::Joystick::axis: return #axis; break;
+    auto axisToString = [](sf::Joystick::Axis k) -> std::string {
+        switch(k)
+        {
+        AXIS(X) AXIS(Y) AXIS(R) AXIS(U)
+
+        default:
+        return "";
+        }
+    };
+#undef KEY
+
     mWindow.create(sf::VideoMode(1024,768), Resources::String_Name);
 
     sf::Event ev;
@@ -144,6 +156,20 @@ int Engine::mainLoop()
                     msg.sender = nullptr;
                     msg.handled = false;
                     mSystem.sendGlobalMessage(mSystem.getMessageRequestId(Kunlaboro::Reason_Message, "Event.Mouse.MoveGame"), msg);
+                } break;
+
+            case sf::Event::JoystickButtonPressed:
+            case sf::Event::JoystickButtonReleased:
+                {
+                    mSystem.sendGlobalMessage("Event.Joystick.Button", std::make_tuple(ev.joystickButton.joystickId, ev.joystickButton.button));
+                } break;
+
+            case sf::Event::JoystickMoved:
+                {
+                    std::string evName = axisToString(ev.joystickMove.axis);
+                    if (evName.empty())
+                        break;
+                    mSystem.sendGlobalMessage("Event.Joystick.Axis." + evName, std::make_tuple(ev.joystickMove.joystickId, ev.joystickMove.position));
                 } break;
             }
         }

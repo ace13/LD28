@@ -59,6 +59,8 @@ void Weapon::addedToEntity()
 
     requestMessage("More ammo!", [this](const Kunlaboro::Message& msg)
     {
+        if (mType == "Bonus") return;
+
         if (mMags > 0)
         {
             if (mBulletsInCurrentMag > 0)

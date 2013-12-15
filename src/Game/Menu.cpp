@@ -46,6 +46,8 @@ void Menu::addedToEntity()
         Kunlaboro::Message question(Kunlaboro::Type_Message, this);
         sys.sendGlobalMessage(sys.getMessageRequestId(Kunlaboro::Reason_Message, "Is the game running?"), question);
 
+        mEntries.push_back(std::make_pair("How do I even play this game?", [this]() { }));
+
         if (question.handled && boost::any_cast<bool>(question.payload))
         {
             mInGame = true;
@@ -60,18 +62,19 @@ void Menu::addedToEntity()
 
                 startGame(sys, getOwnerId());
             }));
-            mEntries.push_back(std::make_pair("Quit Game", [this]() { sendGlobalMessage("ExitGame"); }));
         }
         else
         {
             mInGame = false;
-            mEntries.push_back(std::make_pair("How do I even play this game?", [this]() { }));
+            
             mEntries.push_back(std::make_pair("Start Game", [this, &sys, &startGame]()
             {
                 startGame(sys, getOwnerId());
             }));
-            mEntries.push_back(std::make_pair("End Game", [this]() { sendGlobalMessage("ExitGame"); }));
         }
+        
+        mEntries.push_back(std::make_pair("Scoreboard", [this]() { }));
+        mEntries.push_back(std::make_pair("End Game", [this]() { sendGlobalMessage("ExitGame"); }));
     }
 
     requestMessage("Is the game paused?", [](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = true; });
@@ -107,7 +110,7 @@ void Menu::addedToEntity()
 
             bool pressed = rect.contains(mMousePos);
 
-            string.move(0, rect.height + 16);
+            string.move(0, rect.height + 24);
 
             if (!pressed)
                 continue;
@@ -183,6 +186,6 @@ void Menu::drawUi(sf::RenderTarget& target, float dt)
 
         target.draw(string);
 
-        string.move(0, rect.height + 16);
+        string.move(0, rect.height + 24);
     }
 }
