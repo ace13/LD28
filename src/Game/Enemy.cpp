@@ -8,8 +8,9 @@
 #include <random>
 #include <SFML/Graphics/Sprite.hpp>
 #include <Kunlaboro/EntitySystem.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
-Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mHealth(100), mArmor(1), mTime(0), mLastAng(0), mDrawAng(0), mFadeTime(0), mFear(false)
+Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mHealth(100), mArmor(1), mTime(0), mLastAng(0), mDrawAng(0), mFadeTime(0), mFear(false), mWeapon(nullptr)
 {
 }
 
@@ -19,6 +20,26 @@ Enemy::~Enemy()
 
 void Enemy::addedToEntity()
 {
+    auto getTaunt = [](Weapon* mWeapon, const std::string& type) -> std::string
+    {
+        std::random_device dev;
+        std::uniform_int_distribution<int> dist(0, Resources::Data_Taunts[type].size()-1);
+        
+        std::string taunt = Resources::Data_Taunts[type][dist(dev)];
+        if (mWeapon)
+        {
+            boost::algorithm::replace_all(taunt, "%b", mWeapon->bulletName());
+            boost::algorithm::replace_all(taunt, "%w", mWeapon->weaponName());
+        }
+        else
+        {
+            boost::algorithm::replace_all(taunt, "%b", "nothings");
+            boost::algorithm::replace_all(taunt, "%w", "Empty hands");
+        }
+
+        return taunt;
+    };
+
     if (mPosition == sf::Vector2f())
     {
         sf::Vector2f playerPos;
@@ -32,7 +53,7 @@ void Enemy::addedToEntity()
         mPosition = playerPos + sf::Vector2f(cos(randAng), sin(randAng)) * 1024.f;
     }
 
-    requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
+    requestMessage("Event.Update", [this, &getTaunt](const Kunlaboro::Message& msg)
     {
         float dt = boost::any_cast<float>(msg.payload);
         std::random_device dev;
@@ -94,7 +115,7 @@ void Enemy::addedToEntity()
         if (mHealth <= 25 && !mFear)
         {
             auto dialog = dynamic_cast<Dialog*>(getEntitySystem()->createComponent("Game.Dialog"));
-            dialog->setMessage("The pain!");
+            dialog->setMessage(getTaunt(nullptr, "lowhealth"));
             addLocalComponent(dialog);
             mFear = true;
         }
@@ -144,7 +165,7 @@ void Enemy::addedToEntity()
         auto data = boost::any_cast<std::list<Enemy*>*>(msg.payload);
         data->push_back(this);
     });
-    requestMessage("Did I hit something?", [this](Kunlaboro::Message& msg)
+    requestMessage("Did I hit something?", [this, &getTaunt](Kunlaboro::Message& msg)
     {
         if (msg.sender->getOwnerId() == getOwnerId()) return;
         
@@ -154,9 +175,10 @@ void Enemy::addedToEntity()
         if (diff < 32)
         {
             auto& sys = *getEntitySystem();
+            bool playerKill = !getEntitySystem()->getAllComponentsOnEntity(msg.sender->getOwnerId(), "Game.Player").empty();
 
             auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-            dialog->setMessage("OW");
+            dialog->setMessage(getTaunt(nullptr, playerKill ? "hit" : "friendlyfire"));
             addLocalComponent(dialog);
 
             auto bullet = dynamic_cast<Bullet*>(msg.sender);
@@ -165,7 +187,6 @@ void Enemy::addedToEntity()
 
             if (mHealth <= 0 && lastHealth > 0)
             {
-                bool playerKill = !getEntitySystem()->getAllComponentsOnEntity(msg.sender->getOwnerId(), "Game.Player").empty();
                 sendGlobalMessage("Is dead now", playerKill);
             }
 
@@ -174,9 +195,9 @@ void Enemy::addedToEntity()
         }
     });
 
-    requestComponent("Game.Weapon", [this](const Kunlaboro::Message& msg)
+    requestComponent("Game.Weapon", [this, &getTaunt](const Kunlaboro::Message& msg)
     {
-        auto weap = dynamic_cast<Weapon*>(msg.sender);
+        mWeapon = dynamic_cast<Weapon*>(msg.sender);
 
         if (msg.type == Kunlaboro::Type_Create)
         {
@@ -184,7 +205,7 @@ void Enemy::addedToEntity()
 
             {
                 auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-                dialog->setMessage("Eat " + weap->bulletName() + " and die!");
+                dialog->setMessage(getTaunt(mWeapon, "pickup"));
                 addLocalComponent(dialog);
             }
         }
@@ -193,10 +214,12 @@ void Enemy::addedToEntity()
             auto& sys = *getEntitySystem();
 
             auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-            dialog->setMessage("No more " + weap->bulletName()+ "?\nI AM FLEEING IN FEAR!");
+            dialog->setMessage(getTaunt(mWeapon, "empty"));
             addLocalComponent(dialog);
 
             mFear = true;
+
+            mWeapon = nullptr;
         }
     });
 }

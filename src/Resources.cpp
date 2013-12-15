@@ -1,6 +1,7 @@
 #include "Resources.hpp"
 #include <stdexcept>
 #include <boost/filesystem.hpp>
+#include <fstream>
 
 std::string Resources::String_Name = "Run 'n Gun";
 sf::Font Resources::Font_Dosis;
@@ -9,6 +10,7 @@ sf::Texture Resources::Texture_Enemy;
 sf::Texture Resources::Texture_Ground;
 
 std::vector<DataFile> Resources::Data_Weapons;
+std::unordered_map<std::string, std::vector<std::string>> Resources::Data_Taunts;
 std::unordered_map<std::string, sf::Texture> Resources::Texture_Weapons;
 
 void Resources::initialize()
@@ -34,6 +36,18 @@ void Resources::initialize()
             if (Texture_Weapons.count(test["Magazine Sprite"]) == 0) Texture_Weapons[test["Magazine Sprite"]] = sf::Texture();
 
             Data_Weapons.push_back(test);
+        }
+        else if (it->path().extension() == ".taunts")
+        {
+            std::ifstream ofs(it->path().c_str());
+
+            while (ofs && !ofs.eof())
+            {
+                std::string taunt;
+                std::getline(ofs, taunt);
+
+                Data_Taunts[it->path().stem().string()].push_back(taunt);
+            }
         }
     }
 

@@ -16,57 +16,61 @@ Dialog::~Dialog()
 
 void Dialog::addedToEntity()
 {
-    requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
-    { 
-        float dt = boost::any_cast<float>(msg.payload);
-
-        mTime += dt;
-
-        auto reply = sendQuestion("Where am I?");
-        if (reply.handled)
-        {
-            mPosition = boost::any_cast<sf::Vector2f>(reply.payload);
-        }
-
-        if (mTime > 5.f)
-        {
-            getEntitySystem()->destroyComponent(this);
-        }
-    });
-
-    requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
+    auto has = getEntitySystem()->getAllComponentsOnEntity(getOwnerId(), "Game.Dialog").size();
+    if (has > 1)
+        getEntitySystem()->destroyComponent(this);
+    else
     {
-        auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
+        requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
+        { 
+            float dt = boost::any_cast<float>(msg.payload);
 
-        sf::Text message(mMessage, Resources::Font_Dosis, 26U);
-        auto rect = message.getLocalBounds();
-        sf::RectangleShape box(sf::Vector2f(rect.width + 16, rect.height + 16));
-        sf::ConvexShape speechThingy(3);
+            mTime += dt;
 
-        speechThingy.setPoint(0, sf::Vector2f(rect.width * (1.f / 8.f), rect.height + 8));
-        speechThingy.setPoint(1, sf::Vector2f(0, rect.height + 8 + gDistance * (1.f/3.f)));
-        speechThingy.setPoint(2, sf::Vector2f(rect.width * (2.f/6.f), rect.height + 8));
+            auto reply = sendQuestion("Where am I?");
+            if (reply.handled)
+            {
+                mPosition = boost::any_cast<sf::Vector2f>(reply.payload);
+            }
 
-        float alpha = 0.f;
-        if (mTime > 4.f)
-            alpha = (mTime-4);
+            if (mTime > 5.f)
+            {
+                getEntitySystem()->destroyComponent(this);
+            }
+        });
 
-        speechThingy.setFillColor(sf::Color(255,255,255,255-(255*alpha)));
-        box.setFillColor(sf::Color(255, 255, 255, 255 - (255*alpha)));
-        message.setColor(sf::Color(0, 0, 0, 255 - (255*alpha)));
+        requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
+        {
+            auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
 
-        message.setOrigin(-8, rect.height / 2.f + gDistance);
-        box.setOrigin(0, rect.height / 2.f + 8 + gDistance);
-        speechThingy.setOrigin(0, rect.height / 2.f + gDistance);
-        speechThingy.setPosition(mPosition);
-        message.setPosition(mPosition);
-        box.setPosition(mPosition);
+            sf::Text message(mMessage, Resources::Font_Dosis, 26U);
+            auto rect = message.getLocalBounds();
+            sf::RectangleShape box(sf::Vector2f(rect.width + 16, rect.height + 16));
+            sf::ConvexShape speechThingy(3);
 
-        target.draw(box);
-        target.draw(message);
-        target.draw(speechThingy);
-    });
-    
-    auto num = getEntitySystem()->getAllComponentsOnEntity(getOwnerId(), "Game.Dialog").size();
-    changeRequestPriority("Event.Draw", num);
+            speechThingy.setPoint(0, sf::Vector2f(rect.width * (1.f / 8.f), rect.height + 8));
+            speechThingy.setPoint(1, sf::Vector2f(0, rect.height + 8 + gDistance * (1.f/3.f)));
+            speechThingy.setPoint(2, sf::Vector2f(rect.width * (2.f/6.f), rect.height + 8));
+
+            float alpha = 0.f;
+            if (mTime > 4.f)
+                alpha = (mTime-4);
+
+            speechThingy.setFillColor(sf::Color(255,255,255,255-(255*alpha)));
+            box.setFillColor(sf::Color(255, 255, 255, 255 - (255*alpha)));
+            message.setColor(sf::Color(0, 0, 0, 255 - (255*alpha)));
+
+            message.setOrigin(-8, rect.height / 2.f + gDistance);
+            box.setOrigin(0, rect.height / 2.f + 8 + gDistance);
+            speechThingy.setOrigin(0, rect.height / 2.f + gDistance);
+
+            speechThingy.setPosition(mPosition);
+            message.setPosition(mPosition);
+            box.setPosition(mPosition);
+
+            target.draw(box);
+            target.draw(message);
+            target.draw(speechThingy);
+        });
+    }
 }
