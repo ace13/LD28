@@ -16,8 +16,7 @@ public:
 
     void addedToEntity();
 
-    void update(float dt);
-    void drawUi(sf::RenderTarget& target);
+    void drawUi(sf::RenderTarget& target, float dt);
 
 private:
     std::list<std::pair<std::string, std::function<void()> > > mEntries;

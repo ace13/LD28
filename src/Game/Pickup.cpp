@@ -51,7 +51,7 @@ void Pickup::addedToEntity()
         if (!mTexture)
             return;
 
-        auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
+        auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
 
         sf::Sprite sprite(*mTexture);
         sprite.setOrigin((sf::Vector2f)mTexture->getSize() / 2.f);

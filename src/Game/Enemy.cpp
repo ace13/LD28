@@ -72,7 +72,7 @@ void Enemy::addedToEntity()
     });
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
-        auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
+        auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
 
         sf::Sprite enemy(Resources::Texture_Enemy);
         enemy.setTextureRect(mSheet.getRect(0,0));

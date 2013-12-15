@@ -162,11 +162,11 @@ int Engine::mainLoop()
 
         mWindow.setView(mGameView);
 
-        mSystem.sendGlobalMessage("Event.Draw", (sf::RenderTarget*)&mWindow);
+        mSystem.sendGlobalMessage("Event.Draw", std::make_tuple((sf::RenderTarget*)&mWindow, dt));
 
         mWindow.setView(mUiView);
 
-        mSystem.sendGlobalMessage("Event.DrawUi", (sf::RenderTarget*)&mWindow);
+        mSystem.sendGlobalMessage("Event.DrawUi", std::make_tuple((sf::RenderTarget*)&mWindow, dt));
         
 #ifdef _DEBUG
         frames++;

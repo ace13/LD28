@@ -6,7 +6,7 @@
 
 #include <Kunlaboro/EntitySystem.hpp>
 
-const float gMoveSpeed = 128;
+const float gMoveSpeed = 256;
 const float gCameraFloat = 1024;
 
 enum Move
@@ -50,14 +50,14 @@ void Player::addedToEntity()
             float ang = atan2(diff.y, diff.x);
             diff = sf::Vector2f(cos(ang), sin(ang)) * len;
 
-            mPosition += diff * dt * gMoveSpeed * (1.f + (mPressed & M_Shift)/M_Shift * 3.f);
+            mPosition += diff * dt * gMoveSpeed * (1.f + (mPressed & M_Shift)/M_Shift);
         }
 
         mTime += dt * 2;
     });
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
-        auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
+        auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
 
         sf::Sprite sprite(Resources::Texture_Player);
         sprite.setTextureRect(mSheet.getRect((int)mTime % 4, (mPressed & M_Shift) / M_Shift));
@@ -73,7 +73,7 @@ void Player::addedToEntity()
 
     requestMessage("Event.DrawUi", [this](const Kunlaboro::Message& msg)
     {
-        auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
+        auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
 
         if (mWeapon)
         {

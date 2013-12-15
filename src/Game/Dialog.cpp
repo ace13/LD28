@@ -36,7 +36,7 @@ void Dialog::addedToEntity()
 
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
-        auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
+        auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
 
         sf::Text message(mMessage, Resources::Font_Dosis, 26U);
         auto rect = message.getLocalBounds();

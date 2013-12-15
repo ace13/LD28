@@ -1,6 +1,7 @@
 #include "Bullet.hpp"
 #include "Weapon.hpp"
 #include "Player.hpp"
+#include "../Math.hpp"
 #include <Kunlaboro/EntitySystem.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -40,12 +41,12 @@ void Bullet::addedToEntity()
         auto data = boost::any_cast<std::tuple<sf::Vector2f, float> >(reply.payload);
 
         mPosition = std::get<0>(data);
-        mAngle = std::get<1>(data) * (3.1415f / 180);
+        mAngle = std::get<1>(data) * (M_PI / 180);
 
         std::random_device dev;
         std::uniform_real_distribution<float> rs(-spread, spread);
 
-        mAngle += rs(dev) * (3.1415f / 180);
+        mAngle += rs(dev) * (M_PI / 180);
     }
 
     requestMessage("Event.Update", [this](const Kunlaboro::Message& msg)
@@ -67,7 +68,7 @@ void Bullet::addedToEntity()
 
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
-        auto& target = *boost::any_cast<sf::RenderTarget*>(msg.payload);
+        auto& target = *std::get<0>(boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload));
 
         sf::FloatRect rect;
         {
@@ -81,7 +82,7 @@ void Bullet::addedToEntity()
         sf::Sprite bullet(*mTexture);
         bullet.setPosition(mPosition);
         bullet.setOrigin(mTexture->getSize().x / 2.f, mTexture->getSize().y / 2.f);
-        bullet.setRotation((mAngle + 90) * (180 / 3.1415f));
+        bullet.setRotation((mAngle + 90) * (180 / M_PI));
 
         bool flip = (int)(mLifeTime * 6) % 2;
 
@@ -90,7 +91,7 @@ void Bullet::addedToEntity()
 
         const int trailLength = 6;
         auto size = mTexture->getSize();
-        float sizeLen = (float)sqrt((float)size.x*size.x + size.y*size.y) / 2.f;
+        float sizeLen = (float)sqrt((float)size.x*size.x + size.y*size.y) / 1.618f;
 
         sf::Vector2f dir = sf::Vector2f(cos(mAngle), sin(mAngle));
         bullet.move(dir * (float)-trailLength * sizeLen);

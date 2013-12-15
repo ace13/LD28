@@ -69,15 +69,15 @@ void Menu::addedToEntity()
     requestMessage("Is the game paused?", [](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = true; });
     requestMessage("Event.Update", [this](Kunlaboro::Message& msg)
     {
-        update(boost::any_cast<float>(msg.payload));
-
         if (mInGame)
             msg.handled = true;
     });
     changeRequestPriority("Event.Update", -1);
     requestMessage("Event.DrawUi", [this](const Kunlaboro::Message& msg)
     {
-        drawUi(*boost::any_cast<sf::RenderTarget*>(msg.payload));
+        auto data = boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload);
+
+        drawUi(*std::get<0>(data), std::get<1>(data));
     });
     changeRequestPriority("Event.DrawUi", 1);
     requestMessage("Event.Mouse.Click", [this](Kunlaboro::Message& msg)
@@ -126,13 +126,10 @@ void Menu::addedToEntity()
     }
 }
 
-void Menu::update(float dt)
+void Menu::drawUi(sf::RenderTarget& target, float dt)
 {
     mTime += dt;
-}
 
-void Menu::drawUi(sf::RenderTarget& target)
-{
     if (mInGame)
     {
         sf::RectangleShape shape(target.getView().getSize());
