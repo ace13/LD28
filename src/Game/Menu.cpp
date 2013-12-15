@@ -46,7 +46,9 @@ void Menu::addedToEntity()
         Kunlaboro::Message question(Kunlaboro::Type_Message, this);
         sys.sendGlobalMessage(sys.getMessageRequestId(Kunlaboro::Reason_Message, "Is the game running?"), question);
 
-        mEntries.push_back(std::make_pair("How do I even play this game?", [this]() { }));
+        mEntries.push_back(std::make_pair("How do I even play this game?", [this]() {
+            
+        }));
 
         if (question.handled && boost::any_cast<bool>(question.payload))
         {
@@ -79,12 +81,14 @@ void Menu::addedToEntity()
     }
 
     requestMessage("Is the game paused?", [](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = true; });
-    requestMessage("Event.Update", [this](Kunlaboro::Message& msg)
+    if (mInGame)
     {
-        if (mInGame)
+        requestMessage("Event.Update", [this](Kunlaboro::Message& msg)
+        {
             msg.handled = true;
-    });
-    changeRequestPriority("Event.Update", -1);
+        });
+        changeRequestPriority("Event.Update", -1);
+    }
     requestMessage("Event.DrawUi", [this](const Kunlaboro::Message& msg)
     {
         auto data = boost::any_cast<std::tuple<sf::RenderTarget*,float>>(msg.payload);
