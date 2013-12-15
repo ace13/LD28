@@ -10,7 +10,7 @@
 #include <Kunlaboro/EntitySystem.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
-Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mHealth(100), mArmor(1), mTime(0), mLastAng(0), mDrawAng(0), mFadeTime(0), mFear(false), mWeapon(nullptr)
+Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mHealth(100), mArmor(1), mTime(0), mLastAng(0), mDrawAng(0), mFadeTime(0), mFear(false), mWeapon(nullptr), mInvulTime(0)
 {
 }
 
@@ -57,6 +57,8 @@ void Enemy::addedToEntity()
     {
         float dt = boost::any_cast<float>(msg.payload);
         std::random_device dev;
+
+        mInvulTime = std::max(0.f, mInvulTime - dt);
 
         sf::Vector2f playerPos;
         auto reply = sendGlobalQuestion("Where's the player?");
@@ -153,6 +155,9 @@ void Enemy::addedToEntity()
             enemy.setPosition(mPosition);
             enemy.setRotation(mDrawAng * (180 / M_PI));
 
+            if (mInvulTime > 0)
+                enemy.setColor(sf::Color::Red);
+
             target.draw(enemy);
         }
     });
@@ -188,6 +193,11 @@ void Enemy::addedToEntity()
             if (mHealth <= 0 && lastHealth > 0)
             {
                 sendGlobalMessage("Is dead now", playerKill);
+            }
+            else if (mInvulTime == 0)
+            {
+                mInvulTime = 0.2;
+                mPosition += (mPosition - pos)/diff * 8.f;
             }
 
             msg.payload = true;
