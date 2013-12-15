@@ -34,7 +34,7 @@ private:
 
     sf::Texture *mTexture, *mMagazineTexture, *mBulletTexture;
 
-    float mDamage, mSpread, mFireRate, mReloadTime;
+    float mDamage, mSpread, mFireRate, mReloadTime, mTimeout;
 
     int mMags, mBulletsPerMag, mBulletsInCurrentMag, mBulletsPerShot;
 

@@ -68,7 +68,7 @@ void Enemy::addedToEntity()
             playerPos = boost::any_cast<sf::Vector2f>(reply.payload);
 
         float playerAng = atan2(playerPos.y - mPosition.y, playerPos.x - mPosition.x);
-        float randAng = std::uniform_real_distribution<float>(-0.1, 0.1)(dev);
+        float randAng = std::uniform_real_distribution<float>(-0.2, 0.2)(dev);
         
         mLastAng += randAng;
         if (mFear)
@@ -155,7 +155,7 @@ void Enemy::addedToEntity()
             enemy.setTextureRect(mSheet.getRect(mRandom % 4, mRandom / 4));
             enemy.setOrigin(enemy.getTextureRect().width / 2, enemy.getTextureRect().height / 2);
             enemy.setPosition(mPosition);
-            enemy.setRotation(mDrawAng * (180 / M_PI));
+            enemy.setRotation(mDrawAng * (180 / M_PI) + 90);
 
             if (mInvulTime > 0)
                 enemy.setColor(sf::Color::Red);

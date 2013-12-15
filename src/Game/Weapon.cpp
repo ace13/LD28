@@ -6,7 +6,7 @@
 #include <SFML/Window/Mouse.hpp>
 #include <Kunlaboro/EntitySystem.hpp>
 
-Weapon::Weapon() : Kunlaboro::Component("Game.Weapon")
+Weapon::Weapon() : Kunlaboro::Component("Game.Weapon"), mTimeout(0)
 {
     
 }
@@ -44,8 +44,9 @@ void Weapon::addedToEntity()
 
     requestMessage("Fire ze missiles!", [this](const Kunlaboro::Message& msg)
     {
-        if (mBulletsInCurrentMag > 0)
+        if (mBulletsInCurrentMag > 0 && mTimeout == 0)
         {
+            //mTimeout = mFireRate;
             --mBulletsInCurrentMag;
 
             if (mType == "Bonus") return;
