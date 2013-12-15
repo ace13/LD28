@@ -160,11 +160,13 @@ void Enemy::addedToEntity()
             addLocalComponent(dialog);
 
             auto bullet = dynamic_cast<Bullet*>(msg.sender);
+            float lastHealth = mHealth;
             mHealth -= bullet->getDamage();
 
-            if (mHealth < 0)
+            if (mHealth <= 0 && lastHealth > 0)
             {
-                sendGlobalMessage("Enemy dead!");
+                bool playerKill = !getEntitySystem()->getAllComponentsOnEntity(msg.sender->getOwnerId(), "Game.Player").empty();
+                sendGlobalMessage("Enemy dead!", playerKill);
             }
 
             msg.payload = true;
