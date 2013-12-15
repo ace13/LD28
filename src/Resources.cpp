@@ -8,6 +8,7 @@ sf::Font Resources::Font_Dosis;
 sf::Texture Resources::Texture_Player;
 sf::Texture Resources::Texture_Enemy;
 sf::Texture Resources::Texture_Ground;
+sf::Texture Resources::Texture_Heart;
 
 std::vector<DataFile> Resources::Data_Weapons;
 std::unordered_map<std::string, std::vector<std::string>> Resources::Data_Taunts;
@@ -23,6 +24,8 @@ void Resources::initialize()
     Texture_Enemy.setSmooth(true);
     if (!Texture_Ground.loadFromFile("Ground.png")) throw std::runtime_error("Failed to load Ground.png");
     Texture_Ground.setSmooth(true);
+    if (!Texture_Heart.loadFromFile("Heart.png")) throw std::runtime_error("Failed to load Heart.png");
+    Texture_Heart.setSmooth(true);
 
     for (auto it = boost::filesystem::directory_iterator("."); it != boost::filesystem::directory_iterator(); ++it)
     {

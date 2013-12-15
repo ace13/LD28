@@ -14,6 +14,7 @@ static sf::Font Font_Dosis;
 static sf::Texture Texture_Player;
 static sf::Texture Texture_Enemy;
 static sf::Texture Texture_Ground;
+static sf::Texture Texture_Heart;
 
 static std::vector<DataFile> Data_Weapons;
 static std::unordered_map<std::string, std::vector<std::string>> Data_Taunts;

@@ -19,7 +19,7 @@ enum Move
     M_Shift = 16
 };
 
-Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(Resources::Texture_Player, 4, 2), mTime(0), mPressed(0), mWeapon(nullptr), mLastWalkAng(-1000), mHealth(100)
+Player::Player() : Kunlaboro::Component("Game.Player"), mSheet(Resources::Texture_Player, 4, 2), mHeart(Resources::Texture_Heart, 3, 1), mTime(0), mPressed(0), mWeapon(nullptr), mLastWalkAng(-1000), mHealth(100)
 {
 }
 
@@ -41,7 +41,7 @@ void Player::addedToEntity()
     {
         float dt = boost::any_cast<float>(msg.payload);
 
-        mHealth = std::min(100.f, mHealth + dt);
+        mHealth = std::min(100.f, mHealth + dt * 2);
 
         auto curPos = gameView->getCenter();
         gameView->move((mPosition - curPos) * dt * 2.f);
@@ -159,6 +159,33 @@ void Player::addedToEntity()
 
                 weap.move(mWeapon->bulletTexture().getSize().x + 2, 0);
             }
+        }
+
+        sf::Sprite heart(Resources::Texture_Heart);
+        heart.setTextureRect(mHeart.getRect(0,0));
+        heart.setOrigin(heart.getTextureRect().width / 2.f, heart.getTextureRect().height / 2.f);
+        float width = (heart.getTextureRect().width + 6) * 5;
+
+        heart.setPosition(target.getSize().x / 2.f, heart.getTextureRect().height);
+        heart.move(-width / 2.f, 0);
+
+        for (int i = 0; i < 5; i++)
+        {
+            float full = ((5-i)*20) - 5;
+            float half = ((5-i)*20) - 15;
+            float none = ((5-i)*20) - 25;
+
+            if (mHealth > full)
+                heart.setTextureRect(mHeart.getRect(0,0));
+            else if (mHealth > half)
+                heart.setTextureRect(mHeart.getRect(1,0));
+            else
+                heart.setTextureRect(mHeart.getRect(2,0));
+
+
+            target.draw(heart);
+
+            heart.move(heart.getTextureRect().width + 6, 0);
         }
     });
 
