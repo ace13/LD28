@@ -1,6 +1,7 @@
 #include "EndScreen.hpp"
 #include "World.hpp"
 #include "../Resources.hpp"
+#include <Kunlaboro/EntitySystem.hpp>
 #include <tuple>
 
 EndScreen::EndScreen() : Kunlaboro::Component("Game.EndScreen")
@@ -72,7 +73,19 @@ void EndScreen::addedToEntity()
         sprintf(tmp, "%.2f km/h", stat.MaxSpeed);
 
         daEnd.move(0, daEnd.getLocalBounds().height + 16);
-        daEnd.setString("And the player strolled casually along at " + std::string(tmp) + "...");
+        daEnd.setString("And the player strolled casually along at " + std::string(tmp) + ".");
         target.draw(daEnd);
+
+        daEnd.move(0, daEnd.getLocalBounds().height + 24);
+        daEnd.setString("All in a days work. (Press escape to return to the main menu)");
+        target.draw(daEnd);
+    });
+
+    requestMessage("Event.Key.Escape", [this](const Kunlaboro::Message&)
+    {
+        auto ent = getEntitySystem()->createEntity();
+        getEntitySystem()->addComponent(ent, "Game.Menu");
+
+        getEntitySystem()->destroyEntity(getOwnerId());
     });
 }
