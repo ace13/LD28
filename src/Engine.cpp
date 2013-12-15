@@ -4,6 +4,8 @@
 #include <Kunlaboro/Component.hpp>
 #include <SFML/Window/Event.hpp>
 
+const float gTimeStep = 1.f / 88.f;
+
 class EngineHandler : public Kunlaboro::Component
 {
 public:
@@ -72,13 +74,16 @@ int Engine::mainLoop()
     sf::Clock timer;
 
     mSystem.sendGlobalMessage("Event.Engine.Init");
+    float updateTime = 0;
+
 #ifdef _DEBUG
-    int fps = 0, frames = 0;
+    int fps = 0, frames = 0, ups = 0, updates = 0;
     float frameTime = 0;
 #endif
     while (mWindow.isOpen())
     {
         float dt = std::min(timer.restart().asSeconds(), 0.5f);
+        updateTime += dt;
 
         while (mWindow.pollEvent(ev))
         {
@@ -143,8 +148,15 @@ int Engine::mainLoop()
             }
         }
 
-        ///\TODO Fixed timestep
-        mSystem.sendGlobalMessage("Event.Update", dt);
+        while (updateTime > gTimeStep)
+        {
+            mSystem.sendGlobalMessage("Event.Update", gTimeStep);
+            updateTime -= gTimeStep;
+
+#ifdef _DEBUG
+            updates++;
+#endif
+        }
 
         mWindow.clear();
 
@@ -163,13 +175,15 @@ int Engine::mainLoop()
         {
             frameTime -= 1;
             fps = frames;
+            ups = updates;
             frames = 0;
+            updates = 0;
         }
 
         {
             sf::Text debugText("DEBUG", Resources::Font_Dosis, 16);
             char tmp[256];
-            sprintf_s(tmp, "FPS: %i\nComponents: %i\nEntities: %i", fps, mSystem.numCom(), mSystem.numEnt());
+            sprintf_s(tmp, "FPS: %i, UPS: %i\nComponents: %i\nEntities: %i", fps, ups, mSystem.numCom(), mSystem.numEnt());
 
             debugText.setString(tmp);
             auto rect = debugText.getLocalBounds();
