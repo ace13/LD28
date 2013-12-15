@@ -63,6 +63,12 @@ void Enemy::addedToEntity()
 
             sendMessage("Fire ze missiles!");
         }
+
+        if (mHealth <= 0)
+        {
+            sendMessage("Throw it to the ground!");
+            getEntitySystem()->destroyEntity(getOwnerId());
+        }
     });
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
     {
@@ -88,6 +94,14 @@ void Enemy::addedToEntity()
 
         if (diff < 32)
         {
+            auto& sys = *getEntitySystem();
+
+            auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
+            dialog->setMessage("OW");
+            addLocalComponent(dialog);
+
+            mHealth -= 50;
+
             msg.payload = true;
             msg.handled = true;
         }
@@ -102,7 +116,7 @@ void Enemy::addedToEntity()
             auto& sys = *getEntitySystem();
 
             auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-            dialog->setMessage("Eat " + weap->bulletName() + "s and die!");
+            dialog->setMessage("Eat " + weap->bulletName() + " and die!");
             addLocalComponent(dialog);
         }
         else
@@ -110,7 +124,7 @@ void Enemy::addedToEntity()
             auto& sys = *getEntitySystem();
 
             auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-            dialog->setMessage("No more " + weap->bulletName()+ "s?\nI AM FLEEING IN FEAR!");
+            dialog->setMessage("No more " + weap->bulletName()+ "?\nI AM FLEEING IN FEAR!");
             addLocalComponent(dialog);
         }
     });

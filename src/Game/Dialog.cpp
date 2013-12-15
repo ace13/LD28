@@ -2,7 +2,7 @@
 #include "../Resources.hpp"
 #include <Kunlaboro/EntitySystem.hpp>
 
-const float gDistance = 100;
+const float gDistance = 96;
 const float gHorizDistance = 128;
 
 Dialog::Dialog(): Kunlaboro::Component("Game.Dialog"), mTime(0)
@@ -55,9 +55,9 @@ void Dialog::addedToEntity()
         box.setFillColor(sf::Color(255, 255, 255, 255 - (255*alpha)));
         message.setColor(sf::Color(0, 0, 0, 255 - (255*alpha)));
 
-        message.setOrigin(rect.width / 2.f - gHorizDistance, rect.height / 2.f + gDistance);
-        box.setOrigin(rect.width / 2.f + 8 - gHorizDistance, rect.height / 2.f + 8 + gDistance);
-        speechThingy.setOrigin(rect.width / 2.f - gHorizDistance + 8, rect.height / 2.f + gDistance);
+        message.setOrigin(-8, rect.height / 2.f + gDistance);
+        box.setOrigin(0, rect.height / 2.f + 8 + gDistance);
+        speechThingy.setOrigin(0, rect.height / 2.f + gDistance);
         speechThingy.setPosition(mPosition);
         message.setPosition(mPosition);
         box.setPosition(mPosition);

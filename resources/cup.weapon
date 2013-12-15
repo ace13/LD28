@@ -1,0 +1,16 @@
+Name: A golden cup
+Bullet Name: coffee
+
+Weapon Sprite: Cup.png
+Bullet Sprite: Cup.png
+Magazine Sprite: Cup.png
+
+Type: Pistol
+Bullets Per Shot: 1
+Reload Time: 0
+
+Rate: 0
+Damage: 0
+Spread: 0
+Bullets: 0
+Mags: 0

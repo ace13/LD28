@@ -36,5 +36,6 @@ void Resources::initialize()
     for (auto it = Texture_Weapons.begin(); it != Texture_Weapons.end(); ++it)
     {
         if (!it->second.loadFromFile(it->first)) throw std::runtime_error("Failed to load " + it->first);
+        it->second.setSmooth(true);
     }
 }
