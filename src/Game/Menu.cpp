@@ -47,7 +47,7 @@ void Menu::addedToEntity()
         sys.sendGlobalMessage(sys.getMessageRequestId(Kunlaboro::Reason_Message, "Is the game running?"), question);
 
         mEntries.push_back(std::make_pair("How do I even play this game?", [this]() {
-            
+            getEntitySystem()->addComponent(getOwnerId(), "Game.InfoScreen");
         }));
 
         if (question.handled && boost::any_cast<bool>(question.payload))
@@ -99,6 +99,9 @@ void Menu::addedToEntity()
     requestMessage("Event.Mouse.Click", [this](Kunlaboro::Message& msg)
     {
         auto data = boost::any_cast<std::tuple<sf::Mouse::Button, sf::Vector2f, bool> >(msg.payload); 
+
+        if (std::get<0>(data) != sf::Mouse::Left || !std::get<2>(data))
+            return;
 
         sf::Text string("MENU ENTRY GO HERE", Resources::Font_Dosis);
 

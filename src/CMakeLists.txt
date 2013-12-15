@@ -1,5 +1,5 @@
 find_package(SFML REQUIRED COMPONENTS system window graphics)
-FIND_PACKAGE(Boost REQUIRED COMPONENTS system filesystem thread)
+find_package(Boost REQUIRED COMPONENTS system filesystem thread)
 
 include_directories(
     ${SFML_INCLUDE_DIR}
@@ -31,6 +31,8 @@ set(Game_SOURCES
     Game/Intro.cpp
     Game/Menu.hpp
     Game/Menu.cpp
+    Game/InfoScreen.hpp
+    Game/InfoScreen.cpp
     Game/EndScreen.hpp
     Game/EndScreen.cpp
 

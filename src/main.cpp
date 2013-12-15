@@ -2,6 +2,7 @@
 #include "Resources.hpp"
 #include "Game/Menu.hpp"
 #include "Game/EndScreen.hpp"
+#include "Game/InfoScreen.hpp"
 #include "Game/Intro.hpp"
 #include "Game/Player.hpp"
 #include "Game/World.hpp"
@@ -24,6 +25,7 @@ void registerComponents(Kunlaboro::EntitySystem& sys)
 {
     sys.registerComponent<Menu>("Game.Menu");
     sys.registerComponent<Intro>("Game.Intro");
+    sys.registerComponent<InfoScreen>("Game.InfoScreen");
     sys.registerComponent<EndScreen>("Game.EndScreen");
     sys.registerComponent<Player>("Game.Player");
     sys.registerComponent<World>("Game.World");
@@ -46,7 +48,11 @@ int main(int argc, char** argv)
         Engine eng(sys);
 
         auto ent = sys.createEntity();
+#ifdef _DEBUG
+        sys.addComponent(ent, "Game.Menu");
+#else
         sys.addComponent(ent, "Game.Intro");
+#endif
 
         return eng.mainLoop();
     }
