@@ -8,7 +8,7 @@
 #include <random>
 #include <cmath>
 
-Pickup::Pickup() : Kunlaboro::Component("Game.Pickup"), mAngle(0), mTexture(nullptr)
+Pickup::Pickup() : Kunlaboro::Component("Game.Pickup"), mAngle(0), mTexture(nullptr), mLifeTime(0)
 {
 }
 
@@ -37,6 +37,13 @@ void Pickup::addedToEntity()
             mAngle += mInertia * dt * (M_PI/180);
             mInertia -= dt * 100;
         }
+        else
+        {
+            mLifeTime += dt;
+
+            if (mLifeTime > 10)
+                getEntitySystem()->destroyEntity(getOwnerId());
+        }
     });
 
     requestMessage("Event.Draw", [this](const Kunlaboro::Message& msg)
@@ -50,6 +57,15 @@ void Pickup::addedToEntity()
         sprite.setOrigin((sf::Vector2f)mTexture->getSize() / 2.f);
         sprite.setPosition(mPosition);
         sprite.setRotation(mAngle * (180 / M_PI));
+
+        if (mLifeTime > 6)
+        {
+            if ((int)(mLifeTime*2) % 2)
+                sprite.setColor(sf::Color::Red);
+
+            float perc = 1 - (mLifeTime-6)/4;
+            sprite.setScale(perc, perc);
+        }
 
         target.draw(sprite);
     });

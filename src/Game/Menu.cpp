@@ -44,6 +44,7 @@ void Menu::addedToEntity()
         {
             mInGame = false;
 
+            mEntries.push_back(std::make_pair("How do I even play this game?", [this]() { }));
             mEntries.push_back(std::make_pair("Start Game", [this]()
             {
                 auto& sys = *getEntitySystem();
@@ -164,9 +165,9 @@ void Menu::drawUi(sf::RenderTarget& target)
         string.setString(tuple.first);
         rect = string.getLocalBounds();
         string.setOrigin(rect.width / 2.f, rect.height / 2.f);
-        rect = string.getGlobalBounds();
+        auto grect = string.getGlobalBounds();
 
-        bool hovered = rect.contains(mMousePos);
+        bool hovered = grect.contains(mMousePos);
 
         if (hovered)
         {

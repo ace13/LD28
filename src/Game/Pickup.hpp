@@ -18,5 +18,5 @@ public:
 private:
     sf::Vector2f mPosition;
     sf::Texture* mTexture;
-    float mAngle, mStartAngle, mInertia;
+    float mAngle, mStartAngle, mInertia, mLifeTime;
 };

@@ -100,6 +100,7 @@ void Enemy::addedToEntity()
             dialog->setMessage("OW");
             addLocalComponent(dialog);
 
+            ///\TODO Better damages
             mHealth -= 50;
 
             msg.payload = true;
