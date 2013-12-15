@@ -1,4 +1,5 @@
 #include "Weapon.hpp"
+#include "Pickup.hpp"
 #include "../Resources.hpp"
 #include <random>
 #include <tuple>
@@ -16,6 +17,7 @@ Weapon::~Weapon()
 
 void Weapon::addedToEntity()
 {
+    if (mName.empty())
     { // Weapon Setup
         std::random_device dev;
 
@@ -61,11 +63,22 @@ void Weapon::addedToEntity()
         }   
     }, true);
 
-    requestMessage("Throw it to the ground!", [this](const Kunlaboro::Message& msg)
+    requestMessage("Throw it to the ground!", [this](Kunlaboro::Message& msg)
     {
-        ///\TODO Throw the weapon
-        printf("TODO: Throw weapon TO THE GROUND\n");
-        getEntitySystem()->destroyComponent(this);
+        auto reply = sendQuestion("Where am I?");
+        if (!reply.handled)
+            return;
+
+        getEntitySystem()->removeComponent(getOwnerId(), this);
+
+        auto ent = getEntitySystem()->createEntity();
+        auto pickup = dynamic_cast<Pickup*>(getEntitySystem()->createComponent("Game.Pickup"));
+        pickup->setPosition(boost::any_cast<sf::Vector2f>(reply.payload));
+
+        getEntitySystem()->addComponent(ent, pickup);
+        getEntitySystem()->addComponent(ent, this);        
+
+        msg.handled = true;
     }, true);
 
     requestMessage("What am I holding?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mName; }, true);

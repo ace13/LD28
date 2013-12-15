@@ -8,6 +8,7 @@
 #include "Game/Bullet.hpp"
 #include "Game/Enemy.hpp"
 #include "Game/Dialog.hpp"
+#include "Game/Pickup.hpp"
 
 #include <Kunlaboro/EntitySystem.hpp>
 
@@ -28,6 +29,7 @@ void registerComponents(Kunlaboro::EntitySystem& sys)
     sys.registerComponent<Bullet>("Game.Bullet");
     sys.registerComponent<Enemy>("Game.Enemy");
     sys.registerComponent<Dialog>("Game.Dialog");
+    sys.registerComponent<Pickup>("Game.Pickup");
 }
 
 int main(int argc, char** argv)

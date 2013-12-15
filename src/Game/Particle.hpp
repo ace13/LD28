@@ -12,7 +12,7 @@
 
 #include <Kunlaboro/Component.hpp>
 
-class Particle
+class Particle : public Kunlaboro::Component
 {
 public:
     Particle();

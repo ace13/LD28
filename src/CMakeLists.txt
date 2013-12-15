@@ -14,6 +14,8 @@ set(Engine_SOURCES
     Engine.hpp
     Engine.cpp
 
+    Math.hpp
+
     Resources.hpp
     Resources.cpp
 
@@ -39,6 +41,8 @@ set(Game_SOURCES
     Game/Enemy.hpp
     Game/Enemy.cpp
 
+    Game/Pickup.hpp
+    Game/Pickup.cpp
     Game/Weapon.hpp
     Game/Weapon.cpp
     Game/Bullet.hpp

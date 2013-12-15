@@ -2,16 +2,11 @@
 #include "Weapon.hpp"
 #include "Dialog.hpp"
 #include "../Resources.hpp"
-#include <cmath>
+#include "../Math.hpp"
 #include <tuple>
 #include <random>
 #include <SFML/Graphics/Sprite.hpp>
 #include <Kunlaboro/EntitySystem.hpp>
-
-#ifndef M_PI
-#define M_PI (4.f*atan(1.f))
-#endif
-
 
 Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mPosition(256, 256), mHealth(100), mArmor(1), mTime(0), mLastAng(0)
 {
@@ -86,16 +81,10 @@ void Enemy::addedToEntity()
     requestMessage("Where am I shooting?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = std::make_tuple(mPosition, mLastFire); });
     requestMessage("Did I hit something?", [this](Kunlaboro::Message& msg)
     {
-        const auto dist = [](const sf::Vector2f& a, const sf::Vector2f& b) -> float
-        {
-            sf::Vector2f diff = b - a;
-            return sqrt(diff.x * diff.x + diff.y * diff.y);
-        };
-
         if (msg.sender->getOwnerId() == getOwnerId()) return; 
         
         auto pos = boost::any_cast<sf::Vector2f>(msg.payload);
-        float diff = dist(mPosition, pos);
+        float diff = Math::distance(mPosition, pos);
 
         if (diff < 32)
         {
@@ -113,7 +102,7 @@ void Enemy::addedToEntity()
             auto& sys = *getEntitySystem();
 
             auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-            dialog->setMessage("Eat " + weap->bulletName() + " and die!");
+            dialog->setMessage("Eat " + weap->bulletName() + "s and die!");
             addLocalComponent(dialog);
         }
         else
@@ -121,7 +110,7 @@ void Enemy::addedToEntity()
             auto& sys = *getEntitySystem();
 
             auto dialog = dynamic_cast<Dialog*>(sys.createComponent("Game.Dialog"));
-            dialog->setMessage("No more " + weap->bulletName()+ "!\nRUN AWAY!");
+            dialog->setMessage("No more " + weap->bulletName()+ "s?\nI AM FLEEING IN FEAR!");
             addLocalComponent(dialog);
         }
     });

@@ -1,5 +1,6 @@
 #include "Player.hpp"
 #include "Weapon.hpp"
+#include "../Math.hpp"
 #include "../Resources.hpp"
 
 #include <Kunlaboro/EntitySystem.hpp>
@@ -128,9 +129,17 @@ void Player::addedToEntity()
     {
         if (!boost::any_cast<bool>(msg.payload)) return;
 
-        printf("TODO: Actually pick weapons up\n");
         if (!mWeapon)
-            getEntitySystem()->addComponent(getOwnerId(), "Game.Weapon");
+        {
+            auto reply = sendGlobalQuestion("Mr grabbyhands", mPosition);
+            if (reply.handled)
+            {
+                auto weapon = dynamic_cast<Weapon*>(getEntitySystem()->getAllComponentsOnEntity(reply.sender->getOwnerId(), "Game.Weapon")[0]);
+                
+                getEntitySystem()->removeComponent(reply.sender->getOwnerId(), weapon);
+                addLocalComponent(weapon);
+            }
+        }
     });
     requestMessage("Event.Key.Q", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) sendMessage("Throw it to the ground!"); });
     requestMessage("Event.Key.R", [this](const Kunlaboro::Message& msg) { if (boost::any_cast<bool>(msg.payload)) sendMessage("More ammo!"); });
@@ -171,16 +180,10 @@ void Player::addedToEntity()
 
     requestMessage("Did I hit something?", [this](Kunlaboro::Message& msg)
     {
-        const auto dist = [](const sf::Vector2f& a, const sf::Vector2f& b) -> float
-        {
-            sf::Vector2f diff = b - a;
-            return sqrt(diff.x * diff.x + diff.y * diff.y);
-        };
-
         if (msg.sender->getOwnerId() == getOwnerId()) return; 
         
         auto pos = boost::any_cast<sf::Vector2f>(msg.payload);
-        float diff = dist(mPosition, pos);
+        float diff = Math::distance(mPosition, pos);
 
         if (diff < 32)
         {
