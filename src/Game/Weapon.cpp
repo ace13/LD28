@@ -74,27 +74,29 @@ void Weapon::addedToEntity()
         }   
     }, true);
 
-    requestMessage("Throw it to the ground!", [this](Kunlaboro::Message& msg)
-    {
-        auto reply = sendQuestion("Where am I?");
-        if (!reply.handled)
-            return;
-
-        auto& sys = *getEntitySystem();
-
-        auto ent = sys.createEntity();
-        auto pickup = dynamic_cast<Pickup*>(sys.createComponent("Game.Pickup"));
-        pickup->setPosition(boost::any_cast<sf::Vector2f>(reply.payload));
-
-        sys.addComponent(ent, pickup);
-        
-        sys.removeComponent(getOwnerId(), this);
-        sys.addComponent(ent, this);        
-
-        msg.handled = true;
-    }, true);
+    requestMessage("Throw it to the ground!", &Weapon::thrown, true);
 
     requestMessage("What am I holding?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mName; }, true);
     requestMessage("Such bullets?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mBulletsInCurrentMag; }, true);
     requestMessage("Out of mags?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mMags; }, true);
+}
+
+void Weapon::thrown(Kunlaboro::Message& msg)
+{
+    auto reply = sendQuestion("Where am I?");
+    if (!reply.handled)
+        return;
+
+    auto& sys = *getEntitySystem();
+
+    auto ent = sys.createEntity();
+    auto pickup = dynamic_cast<Pickup*>(sys.createComponent("Game.Pickup"));
+    pickup->setPosition(boost::any_cast<sf::Vector2f>(reply.payload));
+
+    sys.addComponent(ent, pickup);
+        
+    sys.removeComponent(getOwnerId(), this);
+    sys.addComponent(ent, this);        
+
+    msg.handled = true;
 }

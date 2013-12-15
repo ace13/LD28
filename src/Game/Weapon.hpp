@@ -30,6 +30,8 @@ public:
     inline void throwMagazine() { --mMags; }
 
 private:
+    void thrown(Kunlaboro::Message& msg);
+
     std::string mName, mBulletName, mType;
 
     sf::Texture *mTexture, *mMagazineTexture, *mBulletTexture;
