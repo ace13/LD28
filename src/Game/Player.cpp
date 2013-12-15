@@ -241,7 +241,7 @@ void Player::addedToEntity()
         auto pos = boost::any_cast<sf::Vector2f>(msg.payload);
         float diff = Math::distance(mPosition, pos);
 
-        if (diff < 32)
+        if (diff < 24)
         {
             auto bullet = dynamic_cast<Bullet*>(msg.sender);
             float damage = bullet->getDamage();

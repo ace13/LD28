@@ -10,7 +10,7 @@
 #include <Kunlaboro/EntitySystem.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
-Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mHealth(100), mArmor(1), mTime(0), mLastAng(0), mDrawAng(0), mFadeTime(0), mFear(false), mWeapon(nullptr), mInvulTime(0)
+Enemy::Enemy() : Kunlaboro::Component("Game.Enemy"), mSheet(Resources::Texture_Enemy, 4, 2), mHealth(100), mArmor(1), mTime(0), mLastAng(0), mDrawAng(0), mFadeTime(0), mFear(false), mWeapon(nullptr), mInvulTime(0), mRandom(0)
 {
 }
 
@@ -51,6 +51,8 @@ void Enemy::addedToEntity()
         float randAng = std::uniform_real_distribution<float>(0, M_PI * 2)(dev);
 
         mPosition = playerPos + sf::Vector2f(cos(randAng), sin(randAng)) * 1024.f;
+
+        mRandom = std::uniform_int_distribution<int>(0, 7)(dev);
     }
 
     requestMessage("Event.Update", [this, &getTaunt](const Kunlaboro::Message& msg)
@@ -150,7 +152,7 @@ void Enemy::addedToEntity()
             mFadeTime = 0;
 
             sf::Sprite enemy(Resources::Texture_Enemy);
-            enemy.setTextureRect(mSheet.getRect(0,0));
+            enemy.setTextureRect(mSheet.getRect(mRandom % 4, mRandom / 4));
             enemy.setOrigin(enemy.getTextureRect().width / 2, enemy.getTextureRect().height / 2);
             enemy.setPosition(mPosition);
             enemy.setRotation(mDrawAng * (180 / M_PI));

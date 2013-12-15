@@ -14,11 +14,10 @@ public:
 
     void addedToEntity();
 
-
-
 private:
     SpriteSheet mSheet;
     bool mFear;
+    int mRandom;
     float mHealth, mArmor, mTime, mLastFire, mLastAng, mDrawAng, mFadeTime, mInvulTime;
     Weapon* mWeapon;
     sf::Vector2f mPosition;
