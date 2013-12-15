@@ -74,7 +74,7 @@ void Weapon::addedToEntity()
         }   
     }, true);
 
-    requestMessage("Throw it to the ground!", &Weapon::thrown, true);
+    requestMessage("Throw it to the ground!", std::bind(&Weapon::thrown, this, std::placeholders::_1), true);
 
     requestMessage("What am I holding?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mName; }, true);
     requestMessage("Such bullets?", [this](Kunlaboro::Message& msg) { msg.handled = true; msg.payload = mBulletsInCurrentMag; }, true);
