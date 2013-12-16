@@ -33,10 +33,6 @@ void Menu::addedToEntity()
         sys.addComponent(ent, "Game.Player");
         sys.addComponent(ent, "Game.Weapon");
 
-        ent = sys.createEntity();
-        sys.addComponent(ent, "Game.Enemy");
-        sys.addComponent(ent, "Game.Weapon");
-
         sys.destroyEntity(eid);
     };
 
