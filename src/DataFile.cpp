@@ -106,6 +106,11 @@ bool DataFile::loadFromFile(const std::string& filename)
     return true;
 }
 
+bool DataFile::hasEntry(const std::string& name) const
+{
+    return mData.count(name) > 0;
+}
+
 std::string DataFile::operator[](const std::string& key) const
 {
     if (mData.count(key) == 0)

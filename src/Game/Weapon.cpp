@@ -40,6 +40,7 @@ void Weapon::addedToEntity()
         mTexture = &Resources::Texture_Weapons[file["Weapon Sprite"]];
         mBulletTexture = &Resources::Texture_Weapons[file["Bullet Sprite"]];
         mMagazineTexture = &Resources::Texture_Weapons[file["Magazine Sprite"]];
+
     }
 
     requestMessage("Fire ze missiles!", [this](const Kunlaboro::Message& msg)

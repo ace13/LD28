@@ -81,7 +81,7 @@ void Enemy::addedToEntity()
 
         mTime += dt;
 
-        if (mTime > 1)
+        if (mTime > std::uniform_real_distribution<float>(0.5, 1.5)(dev))
         {
             mTime -= 1;
 
