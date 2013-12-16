@@ -42,7 +42,7 @@ void Pickup::addedToEntity()
             mLifeTime += dt;
 
             if (mLifeTime > 10)
-                getEntitySystem()->destroyEntity(getOwnerId());
+                getEntitySystem()->destroyComponent(getEntitySystem()->getAllComponentsOnEntity(getOwnerId(), "Game.Weapon")[0]);
         }
     });
 
